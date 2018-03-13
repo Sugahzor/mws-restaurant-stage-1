@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
   <title>Restaurant Reviews</title>
@@ -13,26 +13,28 @@
   <header>
     <nav>
       <h1>
-        <a href="/">Restaurant Reviews</a>
+        <a tabindex="0" href="/">Restaurant Reviews</a>
       </h1>
     </nav>
   </header>
 
   <main id="maincontent">
 
-    <section id="map-container">
-      <div id="map"></div>
+    <a href="#filter" class="skip-link">Skip to main content</a>
+
+    <section id="map-container" role="presentation" aria-label="google map">
+      <div id="map"></div>   
     </section>
 
     <section>
       <div class="filter-options">
-        <!-- MODIFIED h2 CONTENT -->
-        <h2>Filter By:</h2>
-
+        <h2 id="filter" tabindex="0">Filter By:</h2>
+        <label for="neighborhoods-select">Select Neighborhood</label>
         <select id="neighborhoods-select" name="neighborhoods" onchange="updateRestaurants()">
           <option value="all">All Neighborhoods</option>
         </select>
 
+        <label for="cuisines-select">Select Cuisine</label>
         <select id="cuisines-select" name="cuisines" onchange="updateRestaurants()">
           <option value="all">All Cuisines</option>
         </select>

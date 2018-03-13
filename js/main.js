@@ -122,10 +122,19 @@ resetRestaurants = (restaurants) => {
 }
 
 /**
- * Create all restaurants HTML and add them to the webpage.
+ * Create all restaurants HTML (including no-results element) and add them to the webpage.
  */
 fillRestaurantsHTML = (restaurants = self.restaurants) => {
   const ul = document.getElementById('restaurants-list');
+  ul.setAttribute("tabindex", "0"); 
+  ul.setAttribute("aria-label", "restaurants list");
+  if (restaurants.length === 0) {
+    let noResults = document.createElement("h1");
+    noResults.innerHTML = "Sorry, there are no results matching your criteria.";
+    noResults.setAttribute("tabindex", "0");  
+    ul.appendChild(noResults);
+    return;
+  }
   restaurants.forEach(restaurant => {
     ul.append(createRestaurantHTML(restaurant));
   });
@@ -137,8 +146,9 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
  */
 createRestaurantHTML = (restaurant) => {
   const li = document.createElement('li');
-
+  li.setAttribute("aria-label", "restaurant details");
   const image = document.createElement('img');
+  image.setAttribute("alt", "");
   image.className = 'restaurant-img';
   image.src = DBHelper.imageUrlForRestaurant(restaurant);
   li.append(image);
@@ -156,11 +166,12 @@ createRestaurantHTML = (restaurant) => {
   li.append(address);
 
   const more = document.createElement('a');
-  more.innerHTML = 'View Details';
+  more.setAttribute("aria-label", restaurant.name + ", " + restaurant.neighborhood);
+  more.innerHTML = 'View Details'; 
   more.href = DBHelper.urlForRestaurant(restaurant);
-  li.append(more)
+  li.append(more);
 
-  return li
+  return li;
 }
 
 /**
