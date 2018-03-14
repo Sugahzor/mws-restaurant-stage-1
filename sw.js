@@ -17,7 +17,7 @@ let urlsToCache = [
   "img/7.jpg",
   "img/8.jpg",
   "img/9.jpg",
-  "img/10.jpg",
+  "img/10.jpg"
 ];
 
 self.addEventListener("install", event => {
@@ -29,3 +29,15 @@ self.addEventListener("install", event => {
   );
 });
 
+self.addEventListener("fetch", event => {
+  if (event.request.url.startsWith(self.location.origin)) {
+    event.respondWith(
+      caches.match(event.request).then(response => {
+        if (response) {
+          return response;
+        }
+        return fetch(event.request);
+      })
+    );
+  }
+});
