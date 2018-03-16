@@ -1,6 +1,12 @@
 let restaurant;
 var map;
 
+/* Added for working offline */
+document.addEventListener("DOMContentLoaded", event => {  
+  fetchRestaurantFromURL(restaurant => {
+    fillBreadcrumb();
+  })
+})
 /**
  * Initialize Google map, called from HTML.
  */
@@ -23,7 +29,7 @@ window.initMap = () => {
 /**
  * Get current restaurant from page URL.
  */
-fetchRestaurantFromURL = (callback) => {
+fetchRestaurantFromURL = (callback) => {    
   if (self.restaurant) { // restaurant already fetched!
     callback(null, self.restaurant)
     return;
@@ -44,7 +50,6 @@ fetchRestaurantFromURL = (callback) => {
     });
   }
 }
-
 /**
  * Create restaurant HTML and add it to the webpage
  */
