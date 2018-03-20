@@ -24,5 +24,17 @@ In a terminal, check the version of Python you have: `python -V`. If you have Py
 
 Most of the code in this project has been written to the ES6 JavaScript specification for compatibility with modern web browsers and future proofing JavaScript code. As much as possible, try to maintain use of ES6 in any additional JavaScript you write. 
 
+***********************************************************************************************************************************************
+
+## Restaurant Reviews
+The goal: A **responsive** web app that functions on any device or screen size. Ensure the web app meets the highest development by achieving **accessibility** standards. An app designed to be **mobile-first**.
+The tool: Mobile Web Specialist Nanodegree Program from [Udacity](https://www.udacity.com/course/mobile-web-specialist-nanodegree--nd024)
 
 
+#### Documentation
+[Udacity](https://eu.udacity.com/) - great courses
+[IndexedDB Promised](https://github.com/jakearchibald/idb) - IndexedDB, but with promises
+
+
+#### License 
+The contents of this repository are covered under the [MIT License](https://choosealicense.com/licenses/mit/).

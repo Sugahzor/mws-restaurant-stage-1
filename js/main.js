@@ -199,12 +199,12 @@ createRestaurantHTML = restaurant => {
   const li = document.createElement("li");
   li.setAttribute("aria-label", "restaurant details");
   const image = document.createElement("img");
-  image.setAttribute("alt", "");
+  image.setAttribute("alt", "restaurant presentation photo");
   image.className = "restaurant-img";
   image.src = DataHandler.imageUrlForRestaurant(restaurant);
   li.append(image);
 
-  const name = document.createElement("h1");
+  const name = document.createElement("h3");
   name.innerHTML = restaurant.name;
   li.append(name);
 

@@ -1,15 +1,15 @@
-import idb from "./idb";
+// import idb from "./idb";
 
 
 
-(function() {
-    console.log(idb);
-  let dbPromise = idb.open("test-db", 1, upgradeDb => {
-    console.log("creating DB");
-    let keyValStore = upgradeDb.createObjectStore("keyval");
-    keyValStore.put("world", "hello");
-  });
-})();
+// (function() {
+//     console.log(idb);
+//   let dbPromise = idb.open("test-db", 1, upgradeDb => {
+//     console.log("creating DB");
+//     let keyValStore = upgradeDb.createObjectStore("keyval");
+//     keyValStore.put("world", "hello");
+//   });
+// })();
 
 // (function() {
 //   let db;
