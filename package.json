@@ -1,0 +1,9 @@
+{
+    "name": "restaurant-reviews",
+    "version": "1.0.0",
+    "description": "A fake restaurants reviews page",
+    "license": "ISC",
+    "devDependencies": {
+        "idb": "^2.1.1"
+    }
+}

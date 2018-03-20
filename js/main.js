@@ -1,7 +1,6 @@
 let restaurants, neighborhoods, cuisines;
 var map;
 var markers = [];
-
 /**
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
@@ -12,9 +11,10 @@ document.addEventListener("DOMContentLoaded", event => {
   if (navigator.serviceWorker) {
     navigator.serviceWorker
       .register("sw.js")
-      .then(() => console.log("SW registered"))
+      .then((registration) => console.log("SW registered", registration))
       .catch(e => console.log("Registration failed :(", e));
   }
+
   fetchNeighborhoods();
   fetchCuisines();
   /* Added for working offline */
@@ -25,7 +25,8 @@ document.addEventListener("DOMContentLoaded", event => {
  * Fetch all neighborhoods and set their HTML.
  */
 fetchNeighborhoods = () => {
-  DBHelper.fetchNeighborhoods((error, neighborhoods) => {
+
+  DataHandler.fetchNeighborhoods((error, neighborhoods) => {
     if (error) {
       // Got an error
       console.error(error);
@@ -33,8 +34,9 @@ fetchNeighborhoods = () => {
       self.neighborhoods = neighborhoods;
       fillNeighborhoodsHTML();
     }
-  });
-};
+  });  
+ };
+
 
 /**
  * Set neighborhoods HTML.
@@ -56,7 +58,7 @@ fillNeighborhoodsHTML = (neighborhoods = self.neighborhoods) => {
  * Fetch all cuisines and set their HTML.
  */
 fetchCuisines = () => {
-  DBHelper.fetchCuisines((error, cuisines) => {
+  DataHandler.fetchCuisines((error, cuisines) => {
     if (error) {
       // Got an error!
       console.error(error);
@@ -140,7 +142,7 @@ updateRestaurants = () => {
 
   /* TODO: FIX SELECT VALUE DISPLAY;  */
 
-  DBHelper.fetchRestaurantByCuisineAndNeighborhood(
+  DataHandler.fetchRestaurantByCuisineAndNeighborhood(
     cuisine,
     neighborhood,
     (error, restaurants) => {
@@ -199,7 +201,7 @@ createRestaurantHTML = restaurant => {
   const image = document.createElement("img");
   image.setAttribute("alt", "");
   image.className = "restaurant-img";
-  image.src = DBHelper.imageUrlForRestaurant(restaurant);
+  image.src = DataHandler.imageUrlForRestaurant(restaurant);
   li.append(image);
 
   const name = document.createElement("h1");
@@ -220,7 +222,7 @@ createRestaurantHTML = restaurant => {
     restaurant.name + ", " + restaurant.neighborhood
   );
   more.innerHTML = "View Details";
-  more.href = DBHelper.urlForRestaurant(restaurant);
+  more.href = DataHandler.urlForRestaurant(restaurant);
   li.append(more);
 
   return li;
@@ -232,7 +234,7 @@ createRestaurantHTML = restaurant => {
 addMarkersToMap = (restaurants = self.restaurants) => {
   restaurants.forEach(restaurant => {
     // Add marker to the map
-    const marker = DBHelper.mapMarkerForRestaurant(restaurant, self.map);
+    const marker = DataHandler.mapMarkerForRestaurant(restaurant, self.map);
     google.maps.event.addListener(marker, "click", () => {
       window.location.href = marker.url;
     });
