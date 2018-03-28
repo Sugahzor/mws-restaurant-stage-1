@@ -1,4 +1,4 @@
-let staticCacheName = "restaurants-static-v1";
+let staticCacheName = "restaurants-static-v6";
 let urlsToCache = [
   "./",
   "index.html",  
