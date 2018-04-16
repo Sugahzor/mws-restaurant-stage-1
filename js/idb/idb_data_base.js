@@ -9,51 +9,59 @@
 //   });
 // })();
 
-// (function() {
-  // let db;
-  // const dbName = "Restaurants-DB";
 
-  // let request = window.indexedDB.open(dbName, 1);
+class IdbImplementation {
 
-  // request.onupgradeneeded = event => {
-  //   db = event.target.result;
-  //   var objectStore = db.createObjectStore("restaurants", { keyPath: "id" });
+  static initDB() {
+    if (!navigator.serviceWorker) {
+      return Promise.resolve();
+    }
+    let db;
+    const dbName = "Restaurants-DB";
+    let request = window.indexedDB.open(dbName, 1);
+ 
+    request.onupgradeneeded = event => {
+      db = event.target.result;
+      let objectStore = db.createObjectStore("restaurants", { keyPath: "id" });
 
-  //   // console.log("[IDB] restaurants : ", window.restaurants);
+      objectStore.transaction.oncomplete = event => {
+        let restaurantsObjectStore = db
+          .transaction("restaurants", "readwrite")
+          .objectStore("restaurants");
+        window.restaurants.forEach(restaurant =>
+          restaurantsObjectStore.add(restaurant)
+        );
+      };
+    };
+  }
 
-  //   objectStore.transaction.oncomplete = event => {
-  //     let restaurantsObjectStore = db
-  //       .transaction("restaurants", "readwrite")
-  //       .objectStore("restaurants");
-  //     console.log("[IDB] before writing IDB");
-  //     window.restaurants.forEach(restaurant =>
-  //       restaurantsObjectStore.add(restaurant)
-  //     );
-  //   };
-  // };
+  /**** Retrieve and serve restaurants from our DB, if it exists ****/
+  static showCachedRestaurants() {
+    const dbName = "Restaurants-DB";
+    let dbRequest = window.indexedDB.open(dbName, 1);
+    let restaurantsFromIDB = [];
+    // console.log(dbRequest);
+    if (!dbRequest) {
+      console.log("[DataHandler]: no DB available");
+      return Promise.resolve();
+    }
+    dbRequest.onsuccess = () => {
+      let db = dbRequest.result;
+      console.log("DB result after opening is: ", db);
+      let transaction = db.transaction(["restaurants"]);
+      let store = transaction.objectStore("restaurants");
+      store.openCursor().onsuccess = event => {
+        let cursor = event.target.result;
+        if (cursor) {
+          restaurantsFromIDB.push(cursor.value);
+          cursor.continue();
+        } else {
+          console.log("Iteration complete, result is: ", restaurantsFromIDB);
+        }
+      };
+    };
+    return Promise.resolve(restaurantsFromIDB);
+  }
+  /***************************************************************/
 
-
-//   request.onsuccess = event => {
-//     db = event.target.result;
-//     // console.log("[IDB] success: ", JSON.stringify(db), db);
-//   };
-
-//   console.log("[IDB] success: ", JSON.stringify(db), db);
-//   db.onerror = event =>
-//     console.log("Database error code: " + event.target.errorCode);
-
-//   function retrieveRestaurantsFromIdb() {
-//     console.log("Entering [IDB] .get");
-//     let transaction = db.transaction(["restaurants"]); //IDB name or the store's?
-//     let restaurantsFromIDB = transaction.objectStore("restaurants");
-//     let request = restaurantsFromIDB.get("id");
-//     request.onerror = () => {
-//       console.log("[IDB] retrieval error");
-//     };
-//     request.onsuccess = event => {
-//       let data = request.result.name;
-//       console.log("[IDB] retrieved restaurants are: ", data);
-//     };
-//   }
-//   retrieveRestaurantsFromIdb();
-// })();
+}

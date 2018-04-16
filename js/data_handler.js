@@ -43,6 +43,8 @@ class DataHandler {
         window.restaurants = restaurants;
         /* initialise database */
         DataHandler.initDB();
+        /* Why isnt showCachedRestaurants.then the promise result, but a promise in itself? */
+        DataHandler.showCachedRestaurants().then(result => console.log("promise from showCachedRestaurants", result));
         callback(null, restaurants);
       })
       .catch(err => {
@@ -87,7 +89,7 @@ class DataHandler {
     }
     dbRequest.onsuccess = () => {
       let db = dbRequest.result;
-      console.log("DB result after opening is: ", db);
+      // console.log("DB result after opening is: ", db);
       let transaction = db.transaction(["restaurants"]);
       let store = transaction.objectStore("restaurants");
       store.openCursor().onsuccess = event => {
