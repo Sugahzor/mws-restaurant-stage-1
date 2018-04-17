@@ -2,59 +2,8 @@
  * Common database helper functions.
  */
 // DBHelper
-class DataHandler {
-  /**
-   * Database URL.
-   * Change this to restaurants.json file location on your server.
-   */
-  // static get DATABASE_URL() {
-  //   const port = 3000; // Change this to your server port
-  //   return `http://localhost:${port}/data/restaurants.json`;
-  // }
 
-  /**
-   * Fetch all restaurants.
-   */
-  // static fetchRestaurants(callback) {
-  //   let xhr = new XMLHttpRequest();
-  //   xhr.open("GET", DBHelper.DATABASE_URL);
-  //   xhr.onload = () => {
-  //     if (xhr.status === 200) {
-  //       // Got a success response from server!
-  //       const json = JSON.parse(xhr.responseText);
-  //       const restaurants = json.restaurants;
-  //       callback(null, restaurants);
-  //     } else {
-  //       // Oops!. Got an error from server.
-  //       const error = `Request failed. Returned status of ${xhr.status}`;
-  //       callback(error, null);
-  //     }
-  //   };
-  //   xhr.send();
-  // }
-  /***************************************************************** */
-  /* FETCH RESTAURANTS FROM THE SERVER */
-  static fetchRestaurants(callback) {
-    const rootUrl = "http://localhost:1337/restaurants";
-    // showCachedRestaurants().then(fetch);
-    fetch("http://localhost:1337/restaurants")
-      .then(response => response.json())
-      .then(restaurants => {
-        window.restaurants = restaurants;
-        /* initialise database */
-        DataHandler.initDB();
-        /* Why isnt showCachedRestaurants.then the promise result, but a promise in itself? */
-        DataHandler.showCachedRestaurants().then(result => console.log("promise from showCachedRestaurants", result));
-        callback(null, restaurants);
-      })
-      .catch(err => {
-        console.log("There was an error: ", err);
-        callback(err, null);
-      });
-    // DataHandler.showCachedRestaurants();
-  }
-  /****************** DB implementation ******************/
-  /***** DB init with values *******/
+class IdbImplementation {
   static initDB() {
     if (!navigator.serviceWorker) {
       return Promise.resolve();
@@ -77,12 +26,12 @@ class DataHandler {
       };
     };
   }
+
   /**** Retrieve and serve restaurants from our DB, if it exists ****/
-  static showCachedRestaurants() {
+  static showCachedRestaurants(callback) {
     const dbName = "Restaurants-DB";
     let dbRequest = window.indexedDB.open(dbName, 1);
     let restaurantsFromIDB = [];
-    // console.log(dbRequest);
     if (!dbRequest) {
       console.log("[DataHandler]: no DB available");
       return Promise.resolve();
@@ -99,12 +48,46 @@ class DataHandler {
           cursor.continue();
         } else {
           console.log("Iteration complete, result is: ", restaurantsFromIDB);
+          // if (restaurantsFromIDB) {
+          callback(null, restaurantsFromIDB);
+          // }
         }
       };
     };
-    return Promise.resolve(restaurantsFromIDB);
+    // return Promise.resolve(restaurantsFromIDB);
   }
   /***************************************************************/
+}
+
+
+class DataHandler {
+  /* FETCH RESTAURANTS FROM THE SERVER */
+
+  static fetchRestaurants(callback) {
+    const rootUrl = "http://localhost:1337/restaurants";
+    console.log(window.restaurants);
+
+    // if (window.restaurants) {
+      IdbImplementation.showCachedRestaurants(callback);
+      // console.log("On IdbImplementation if branch");
+    // }
+
+    fetch("http://localhost:1337/restaurants")
+      .then(response => response.json())
+      .then(restaurants => {
+        window.restaurants = restaurants;
+        console.log(window.restaurants);
+        /* initialise database */
+        IdbImplementation.initDB();
+        callback(null, restaurants);
+      })
+      .catch(err => {
+        console.log("There was an error: ", err);
+        callback(err, null);
+      });
+  }
+
+  
   /**
    * Fetch a restaurant by its ID.
    */

@@ -1,10 +1,11 @@
-let staticCacheName = "restaurants-static-v1";
+let staticCacheName = "restaurants-static-v16";
 let urlsToCache = [
   "./",
   "index.html",  
   "restaurant.html",
   "css/styles.css",
   "data/restaurants.json",
+  // "js/idb/idb_data_base.js",
   "js/data_handler.js",
   "js/main.js",
   "js/restaurant_info.js",
@@ -19,6 +20,7 @@ let urlsToCache = [
   "img/9.jpg",
   "img/10.jpg"
 ];
+
 
 self.addEventListener("install", event => {
   event.waitUntil(

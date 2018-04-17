@@ -9,9 +9,7 @@
 //   });
 // })();
 
-
 class IdbImplementation {
-
   static initDB() {
     if (!navigator.serviceWorker) {
       return Promise.resolve();
@@ -19,7 +17,7 @@ class IdbImplementation {
     let db;
     const dbName = "Restaurants-DB";
     let request = window.indexedDB.open(dbName, 1);
- 
+
     request.onupgradeneeded = event => {
       db = event.target.result;
       let objectStore = db.createObjectStore("restaurants", { keyPath: "id" });
@@ -36,18 +34,17 @@ class IdbImplementation {
   }
 
   /**** Retrieve and serve restaurants from our DB, if it exists ****/
-  static showCachedRestaurants() {
+  static showCachedRestaurants(callback) {
     const dbName = "Restaurants-DB";
     let dbRequest = window.indexedDB.open(dbName, 1);
     let restaurantsFromIDB = [];
-    // console.log(dbRequest);
     if (!dbRequest) {
       console.log("[DataHandler]: no DB available");
       return Promise.resolve();
     }
     dbRequest.onsuccess = () => {
       let db = dbRequest.result;
-      console.log("DB result after opening is: ", db);
+      // console.log("DB result after opening is: ", db);
       let transaction = db.transaction(["restaurants"]);
       let store = transaction.objectStore("restaurants");
       store.openCursor().onsuccess = event => {
@@ -57,11 +54,13 @@ class IdbImplementation {
           cursor.continue();
         } else {
           console.log("Iteration complete, result is: ", restaurantsFromIDB);
+          if (restaurantsFromIDB) {
+          callback(null, restaurantsFromIDB);
+          }
         }
       };
     };
-    return Promise.resolve(restaurantsFromIDB);
+    // return Promise.resolve(restaurantsFromIDB);
   }
   /***************************************************************/
-
 }
