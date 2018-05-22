@@ -1,6 +1,15 @@
 let restaurants, neighborhoods, cuisines;
 var map;
 var markers = [];
+  // Lazy-loading Intersection Observable :
+  const intersectObservable = new IntersectionObserver(input => {
+    let imageElement = input[0].target;
+    if (input[0].intersectionRatio > 0 && imageElement.dataset.src) {
+      console.log(imageElement.dataset.src, " should be visible.");
+      imageElement.setAttribute("src", imageElement.dataset.src);
+      intersectObservable.unobserve(input[0].target);
+    }
+  });
 /**
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
@@ -198,10 +207,11 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
 createRestaurantHTML = restaurant => {
   const li = document.createElement("li");
   li.setAttribute("aria-label", "restaurant details");
-  const image = document.createElement("img");
+  const image = document.createElement("img");  
   image.setAttribute("alt", "restaurant presentation photo");
   image.className = "restaurant-img";
-  image.src = DataHandler.imageUrlForRestaurant(restaurant);
+  image.dataset.src = DataHandler.imageUrlForRestaurant(restaurant);
+  intersectObservable.observe(image);
   li.append(image);
 
   const name = document.createElement("h3");
@@ -223,7 +233,7 @@ createRestaurantHTML = restaurant => {
   );
   more.innerHTML = "View Details";
   more.href = DataHandler.urlForRestaurant(restaurant);
-  li.append(more);
+  li.append(more);  
 
   return li;
 };
@@ -266,3 +276,5 @@ function storageAvailable(type) {
     );
   }
 }
+
+
