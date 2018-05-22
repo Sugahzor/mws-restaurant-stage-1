@@ -1,4 +1,4 @@
-let staticCacheName = "restaurants-static-v11";
+let staticCacheName = "restaurants-static-v2_14";
 let urlsToCache = [
   "./",
   "index.html",  
@@ -6,6 +6,7 @@ let urlsToCache = [
   "data/manifest.json",
   "css/styles.css",
   "data/restaurants.json",
+  "js/idb_data_base.js",
   "js/data_handler.js",
   "js/main.js",
   "js/restaurant_info.js",
@@ -20,6 +21,7 @@ let urlsToCache = [
   "img/9.jpg",
   "img/10.jpg"
 ];
+
 
 self.addEventListener("install", event => {
   event.waitUntil(
