@@ -1,11 +1,11 @@
-let staticCacheName = "restaurants-static-v17";
+let staticCacheName = "restaurants-static-v2_14";
 let urlsToCache = [
   "./",
   "index.html",  
   "restaurant.html",
   "css/styles.css",
   "data/restaurants.json",
-  // "js/idb/idb_data_base.js",
+  "js/idb_data_base.js",
   "js/data_handler.js",
   "js/main.js",
   "js/restaurant_info.js",

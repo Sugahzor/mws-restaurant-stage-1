@@ -2,94 +2,76 @@
  * Common database helper functions.
  */
 // DBHelper
-
-// class IdbImplementation {
-//   static initDB() {
-//     if (!navigator.serviceWorker) {
-//       return Promise.resolve();
-//     }
-//     let db;
-//     const dbName = "Restaurants-DB";
-//     let request = window.indexedDB.open(dbName, 1);
-
-//     request.onupgradeneeded = event => {
-//       db = event.target.result;
-//       console.log(db, "db");
-//       let objectStore = db.createObjectStore("restaurants", { keyPath: "id" });
-//       console.log(objectStore);
-
-//       objectStore.transaction.oncomplete = event => {
-//         let restaurantsObjectStore = db
-//           .transaction("restaurants", "readwrite")
-//           .objectStore("restaurants");
-//         window.restaurants.forEach(restaurant =>
-//           restaurantsObjectStore.add(restaurant)
-//         );
-//       };
-//     };
-//   }
-
-//   /**** Retrieve and serve restaurants from our DB, if it exists ****/
-//   static showCachedRestaurants(callback) {
-//     const dbName = "Restaurants-DB";
-//     let dbRequest = window.indexedDB.open(dbName, 1);
-//     let restaurantsFromIDB = [];
-//     if (!dbRequest) {
-//       console.log("[DataHandler]: no DB available");
-//       return Promise.resolve();
-//     }
-//     dbRequest.onsuccess = () => {
-//       let db = dbRequest.result;
-//       // console.log("DB result after opening is: ", db);
-//       let transaction = db.transaction(["restaurants"]);
-//       let store = transaction.objectStore("restaurants");
-//       store.openCursor().onsuccess = event => {
-//         let cursor = event.target.result;
-//         if (cursor) {
-//           restaurantsFromIDB.push(cursor.value);
-//           cursor.continue();
-//         } else {
-//           console.log("Iteration complete, result is: ", restaurantsFromIDB);
-//           // if (restaurantsFromIDB) {
-//           callback(null, restaurantsFromIDB);
-//           // }
-//         }
-//       };
-//     };
-//     // return Promise.resolve(restaurantsFromIDB);
-//   }
-//   /***************************************************************/
-// }
-
-
 class DataHandler {
-  /* FETCH RESTAURANTS FROM THE SERVER */
 
+  /* FETCH RESTAURANTS FROM THE SERVER OR INDEXEDB IF OFFLINE*/
   static fetchRestaurants(callback) {
     const rootUrl = "http://localhost:1337/restaurants";
-    console.log(window.restaurants);
-
-    // if (window.restaurants) {
-      IdbImplementation.showCachedRestaurants(callback);
-      // console.log("On IdbImplementation if branch");
-    // }
-
     fetch("http://localhost:1337/restaurants")
       .then(response => response.json())
       .then(restaurants => {
         window.restaurants = restaurants;
-        console.log(window.restaurants);
-        /* initialise database */
-        IdbImplementation.initDB();
-        callback(null, restaurants);
+        /* initialise database the first time it's called - onupgradeneeded will fire */
+        RestaurantsIndexedDB.initDB();
+        // callback(null, restaurants);
       })
       .catch(err => {
         console.log("There was an error: ", err);
         callback(err, null);
       });
+      RestaurantsIndexedDB.showCachedRestaurants(callback);
   }
 
-  
+  // /****************** DB implementation ******************/
+  // /***** DB init with values *******/
+  // static initDB() {
+  //   if (!navigator.serviceWorker) {
+  //     return Promise.resolve();
+  //   }
+  //   let db;
+  //   const dbName = "Restaurants-DB";
+  //   let request = window.indexedDB.open(dbName, 1);
+
+  //   request.onupgradeneeded = event => {
+  //     db = event.target.result;
+  //     let objectStore = db.createObjectStore("restaurants", {
+  //       keyPath: "id"
+  //     });
+
+  //     objectStore.transaction.oncomplete = event => {
+  //       let restaurantsObjectStore = db
+  //         .transaction("restaurants", "readwrite")
+  //         .objectStore("restaurants");
+  //       window.restaurants.forEach(restaurant =>
+  //         restaurantsObjectStore.add(restaurant)
+  //       );
+  //     };
+  //   };
+  // }
+  // /**** Retrieve and serve restaurants from our DB ****/
+  // static showCachedRestaurants(callback) {
+  //   const dbName = "Restaurants-DB";
+  //   let dbRequest = window.indexedDB.open(dbName, 1);
+  //   let restaurantsFromIDB = [];
+
+  //   dbRequest.onsuccess = () => {
+  //     let db = dbRequest.result;
+  //     console.log("DB result after opening is: ", db);
+  //     let transaction = db.transaction(["restaurants"]);
+  //     let store = transaction.objectStore("restaurants");
+  //     store.openCursor().onsuccess = event => {
+  //       let cursor = event.target.result;
+  //       if (cursor) {
+  //         restaurantsFromIDB.push(cursor.value);
+  //         cursor.continue();
+  //       } else {
+  //         callback(null, restaurantsFromIDB);
+  //       }
+  //     };
+  //   };
+  // }
+
+  /***************************************************************/
   /**
    * Fetch a restaurant by its ID.
    */

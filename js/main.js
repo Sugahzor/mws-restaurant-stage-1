@@ -14,7 +14,6 @@ document.addEventListener("DOMContentLoaded", event => {
       // .then((registration) => console.log("SW registered", registration))
       .catch(e => console.log("Registration failed :(", e));
   }
-
   fetchNeighborhoods();
   fetchCuisines();
   /* Added for working offline */
