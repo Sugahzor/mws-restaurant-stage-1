@@ -15,8 +15,5 @@
   "bugs": {
     "url": "https://github.com/Sugahzor/mws-restaurant-stage-1/issues"
   },
-  "homepage": "https://github.com/Sugahzor/mws-restaurant-stage-1#readme",
-  "dependencies": {
-    "idb": "^2.1.1"
-  }
+  "homepage": "https://github.com/Sugahzor/mws-restaurant-stage-1#readme"
 }

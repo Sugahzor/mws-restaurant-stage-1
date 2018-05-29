@@ -5,7 +5,6 @@ var markers = [];
   const intersectObservable = new IntersectionObserver(input => {
     let imageElement = input[0].target;
     if (input[0].intersectionRatio > 0 && imageElement.dataset.src) {
-      console.log(imageElement.dataset.src, " should be visible.");
       imageElement.setAttribute("src", imageElement.dataset.src);
       intersectObservable.unobserve(input[0].target);
     }
@@ -20,7 +19,6 @@ document.addEventListener("DOMContentLoaded", event => {
   if (navigator.serviceWorker) {
     navigator.serviceWorker
       .register("sw.js")
-      // .then((registration) => console.log("SW registered", registration))
       .catch(e => console.log("Registration failed :(", e));
   }
   fetchNeighborhoods();
@@ -130,8 +128,6 @@ updateRestaurants = () => {
     } else {
       cIndex = localStorage.getItem("cuisIndex");
       cuisine = localStorage.getItem("cuisine");
-      console.log(cSelect);
-      
     };
 
     if (nIndex >= 0) {

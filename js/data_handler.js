@@ -12,64 +12,63 @@ class DataHandler {
       .then(restaurants => {
         window.restaurants = restaurants;
         /* initialise database the first time it's called - onupgradeneeded will fire */
-        RestaurantsIndexedDB.initDB();
-        // callback(null, restaurants);
+        this.initDB();
+        callback(null, restaurants);
       })
       .catch(err => {
         console.log("There was an error: ", err);
         callback(err, null);
       });
-      RestaurantsIndexedDB.showCachedRestaurants(callback);
+    this.showCachedRestaurants(callback);
   }
 
-  // /****************** DB implementation ******************/
-  // /***** DB init with values *******/
-  // static initDB() {
-  //   if (!navigator.serviceWorker) {
-  //     return Promise.resolve();
-  //   }
-  //   let db;
-  //   const dbName = "Restaurants-DB";
-  //   let request = window.indexedDB.open(dbName, 1);
+  /****************** DB implementation ******************/
+  /***** DB init with values *******/
+  static initDB() {
+    if (!navigator.serviceWorker) {
+      return Promise.resolve();
+    }
+    let db;
+    const dbName = "Restaurants-DB";
+    let request = window.indexedDB.open(dbName, 1);
 
-  //   request.onupgradeneeded = event => {
-  //     db = event.target.result;
-  //     let objectStore = db.createObjectStore("restaurants", {
-  //       keyPath: "id"
-  //     });
+    request.onupgradeneeded = event => {
+      db = event.target.result;
+      let objectStore = db.createObjectStore("restaurants", {
+        keyPath: "id"
+      });
 
-  //     objectStore.transaction.oncomplete = event => {
-  //       let restaurantsObjectStore = db
-  //         .transaction("restaurants", "readwrite")
-  //         .objectStore("restaurants");
-  //       window.restaurants.forEach(restaurant =>
-  //         restaurantsObjectStore.add(restaurant)
-  //       );
-  //     };
-  //   };
-  // }
-  // /**** Retrieve and serve restaurants from our DB ****/
-  // static showCachedRestaurants(callback) {
-  //   const dbName = "Restaurants-DB";
-  //   let dbRequest = window.indexedDB.open(dbName, 1);
-  //   let restaurantsFromIDB = [];
+      objectStore.transaction.oncomplete = event => {
+        let restaurantsObjectStore = db
+          .transaction("restaurants", "readwrite")
+          .objectStore("restaurants");
+        window.restaurants.forEach(restaurant =>
+          restaurantsObjectStore.add(restaurant)
+        );
+      };
+    };
+  }
+  /**** Retrieve and serve restaurants from our DB ****/
+  static showCachedRestaurants(callback) {
+    const dbName = "Restaurants-DB";
+    let dbRequest = window.indexedDB.open(dbName, 1);
+    let restaurantsFromIDB = [];
 
-  //   dbRequest.onsuccess = () => {
-  //     let db = dbRequest.result;
-  //     console.log("DB result after opening is: ", db);
-  //     let transaction = db.transaction(["restaurants"]);
-  //     let store = transaction.objectStore("restaurants");
-  //     store.openCursor().onsuccess = event => {
-  //       let cursor = event.target.result;
-  //       if (cursor) {
-  //         restaurantsFromIDB.push(cursor.value);
-  //         cursor.continue();
-  //       } else {
-  //         callback(null, restaurantsFromIDB);
-  //       }
-  //     };
-  //   };
-  // }
+    dbRequest.onsuccess = () => {
+      let db = dbRequest.result;
+      let transaction = db.transaction(["restaurants"]);
+      let store = transaction.objectStore("restaurants");
+      store.openCursor().onsuccess = event => {
+        let cursor = event.target.result;
+        if (cursor) {
+          restaurantsFromIDB.push(cursor.value);
+          cursor.continue();
+        } else {
+          callback(null, restaurantsFromIDB);
+        }
+      };
+    };
+  }
 
   /***************************************************************/
   /**

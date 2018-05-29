@@ -1,4 +1,4 @@
-let staticCacheName = "restaurants-static-v2_14";
+let staticCacheName = "restaurants-static-v2_17";
 let urlsToCache = [
   "./",
   "index.html",  
@@ -6,7 +6,7 @@ let urlsToCache = [
   "data/manifest.json",
   "css/styles.css",
   "data/restaurants.json",
-  "js/idb_data_base.js",
+  // "js/idb_data_base.js",
   "js/data_handler.js",
   "js/main.js",
   "js/restaurant_info.js",
@@ -36,7 +36,6 @@ self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys().then(cacheNames => Promise.all(cacheNames.map(cache => {
       if (cache !== staticCacheName) {
-        console.log("[ServiceWorker] removing cached files from ", cache);
         return caches.delete(cache);
       }
     })))
@@ -48,7 +47,6 @@ self.addEventListener("fetch", event => {
     event.respondWith(
       caches.match(event.request).then(response => {
         if (response) {
-          // console.log("[ServiceWorker] Found in cache ", event.request.url);
           return response;
         }
         return fetch(event.request);
