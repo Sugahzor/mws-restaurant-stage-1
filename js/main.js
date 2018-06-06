@@ -21,6 +21,7 @@ document.addEventListener("DOMContentLoaded", event => {
       .register("sw.js")
       .catch(e => console.log("Registration failed :(", e));
   }
+  // DataHandler.showCachedRestaurants();
   fetchNeighborhoods();
   fetchCuisines();
   /* Added for working offline */
@@ -203,7 +204,7 @@ createRestaurantHTML = restaurant => {
   const li = document.createElement("li");
   li.setAttribute("aria-label", "restaurant details");
   const image = document.createElement("img");  
-  image.setAttribute("alt", "restaurant presentation photo");
+  image.setAttribute("alt", `Restaurant ${restaurant.name} presentation photo`);
   image.className = "restaurant-img";
   image.dataset.src = DataHandler.imageUrlForRestaurant(restaurant);
   intersectObservable.observe(image);

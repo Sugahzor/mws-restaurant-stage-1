@@ -6,20 +6,23 @@ class DataHandler {
 
   /* FETCH RESTAURANTS FROM THE SERVER OR INDEXEDB IF OFFLINE*/
   static fetchRestaurants(callback) {
-    const rootUrl = "http://localhost:1337/restaurants";
-    fetch("http://localhost:1337/restaurants")
-      .then(response => response.json())
-      .then(restaurants => {
-        window.restaurants = restaurants;
-        /* initialise database the first time it's called - onupgradeneeded will fire */
-        this.initDB();
-        callback(null, restaurants);
-      })
-      .catch(err => {
-        console.log("There was an error: ", err);
-        callback(err, null);
-      });
-    this.showCachedRestaurants(callback);
+    if (!navigator.onLine) {
+      DataHandler.showCachedRestaurants(callback);
+    } else {
+      const rootUrl = "http://localhost:1337/restaurants";
+      fetch("http://localhost:1337/restaurants")
+        .then(response => response.json())
+        .then(restaurants => {
+          window.restaurants = restaurants;
+          /* initialise database the first time it's called - onupgradeneeded will fire */
+          this.initDB();
+          callback(null, restaurants);
+        })
+        .catch(err => {
+          console.log("There was an error: ", err);
+          callback(err, null);
+        });
+    }
   }
 
   /****************** DB implementation ******************/
@@ -37,7 +40,6 @@ class DataHandler {
       let objectStore = db.createObjectStore("restaurants", {
         keyPath: "id"
       });
-
       objectStore.transaction.oncomplete = event => {
         let restaurantsObjectStore = db
           .transaction("restaurants", "readwrite")
@@ -64,10 +66,14 @@ class DataHandler {
           restaurantsFromIDB.push(cursor.value);
           cursor.continue();
         } else {
+          window.restaurants = restaurantsFromIDB;
           callback(null, restaurantsFromIDB);
         }
       };
     };
+    dbRequest.onerror = () => {
+      console.log("There was an error accessing the DB.");
+    }
   }
 
   /***************************************************************/
@@ -75,6 +81,10 @@ class DataHandler {
    * Fetch a restaurant by its ID.
    */
   static fetchRestaurantById(id, callback) {
+
+    if (!navigator.onLine) {
+      DataHandler.showCachedRestaurants(callback)
+    }
     // fetch all restaurants with proper error handling.
     DataHandler.fetchRestaurants((error, restaurants) => {
       if (error) {
