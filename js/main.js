@@ -1,4 +1,4 @@
-let restaurants, neighborhoods, cuisines;
+let restaurants, reviews, neighborhoods, cuisines;
 var map;
 var markers = [];
   // Lazy-loading Intersection Observable :
@@ -21,11 +21,11 @@ document.addEventListener("DOMContentLoaded", event => {
       .register("sw.js")
       .catch(e => console.log("Registration failed :(", e));
   }
-  // DataHandler.showCachedRestaurants();
   fetchNeighborhoods();
   fetchCuisines();
   /* Added for working offline */
   updateRestaurants();
+  DataHandler.fetchReviews();
 });
 
 /**

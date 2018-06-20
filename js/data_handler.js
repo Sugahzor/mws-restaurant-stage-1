@@ -13,6 +13,7 @@ class DataHandler {
       fetch("http://localhost:1337/restaurants")
         .then(response => response.json())
         .then(restaurants => {
+          // console.log(restaurants);
           window.restaurants = restaurants;
           /* initialise database the first time it's called - onupgradeneeded will fire */
           this.initDB();
@@ -23,6 +24,43 @@ class DataHandler {
           callback(err, null);
         });
     }
+  }
+
+  static fetchReviews() {
+    // const GET_REVIEWS_URL_BY_ID = `http://localhost:1337/reviews/?restaurant_id=${id}`;
+    const GET_REVIEWS_URL = "http://localhost:1337/reviews/";
+    fetch(GET_REVIEWS_URL)
+      .then(response => response.json())
+      .then(reviews => {
+        window.reviews = reviews;
+        this.initReviewsDB();
+        console.log(reviews);
+      })
+  }
+
+  static initReviewsDB() {
+    if (!navigator.serviceWorker) {
+      return Promise.resolve();
+    }
+    let db;
+    const dbName = "Reviews-DB";
+    let request = window.indexedDB.open(dbName, 1);
+
+    request.onupgradeneeded = event => {
+      db = event.target.result;
+      let objectStore = db.createObjectStore("reviews", {
+        keyPath: "id"
+      });
+      objectStore.createIndex("restaurant_id", "restaurant_id", { unique: false });
+      objectStore.transaction.oncomplete = event => {
+        let reviewsObjectStore = db
+          .transaction("reviews", "readwrite")
+          .objectStore("reviews");
+        window.reviews.forEach(review =>
+          reviewsObjectStore.add(review)
+        );
+      };
+    };
   }
 
   /****************** DB implementation ******************/
@@ -234,3 +272,15 @@ class DataHandler {
     return marker;
   }
 }
+
+
+
+// POST request:
+// fetch('url', {
+//   method: 'POST',
+//   body: JSON.stringify(the data to POST),
+//   headers: { 'content-type': 'application/json' }
+// })
+// .then(response => response.json())
+// .catch(error => { console.log(error); 
+// });
