@@ -415,6 +415,13 @@ nav h1 a:hover {
   border-radius: 0 0 20px 0;
   box-shadow: 10px 10px #eeeeee;
 }
+button {
+  margin: 0 0 20px;
+  background-color: #eeeeee;
+  color: #ffa500;
+  height: 46px;
+  font-weight: 600;
+}
 
 /*
 *
@@ -526,6 +533,10 @@ nav h1 a:hover {
 
   #reviews-container h4 {
     text-align: center;
+  }
+  button {
+    margin-right: auto;
+    margin-left: auto;
   }
 }
 

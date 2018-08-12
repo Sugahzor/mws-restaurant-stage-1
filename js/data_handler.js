@@ -10,7 +10,7 @@ class DataHandler {
       DataHandler.showCachedRestaurants(callback);
     } else {
       const rootUrl = "http://localhost:1337/restaurants";
-      fetch("http://localhost:1337/restaurants")
+      fetch("http://localhost:1337/restaurants/")
         .then(response => response.json())
         .then(restaurants => {
           // console.log(restaurants);
@@ -26,15 +26,30 @@ class DataHandler {
     }
   }
 
+  static fetchReviewsById(id, restaurant, callback) {
+    if (!navigator.onLine) {
+      DataHandler.showCachedReviews(id, callback);
+    } else {
+      const rootUrl = `http://localhost:1337/reviews/?restaurant_id=${id}`;
+      fetch(rootUrl)
+        .then(response => response.json())
+        .then(reviewsById => {
+          restaurant.reviews = reviewsById;
+          // Got the restaurant and it's reviews
+          callback(null, restaurant);
+        })
+        .catch(err => console.log("There was an error: ", err));
+    }
+  }
+
   static fetchReviews() {
-    // const GET_REVIEWS_URL_BY_ID = `http://localhost:1337/reviews/?restaurant_id=${id}`;
     const GET_REVIEWS_URL = "http://localhost:1337/reviews/";
     fetch(GET_REVIEWS_URL)
       .then(response => response.json())
       .then(reviews => {
         window.reviews = reviews;
         this.initReviewsDB();
-        console.log(reviews);
+        // console.log(reviews);
       })
   }
 
@@ -113,6 +128,28 @@ class DataHandler {
       console.log("There was an error accessing the DB.");
     }
   }
+  static showCachedReviews(id, restaurant, callback) {
+    const dbName = "Reviews-DB";
+    let dbRequest = window.indexedDB.open(dbName, 1);
+    let reviewsFromDB = [];
+
+    dbRequest.onsuccess = () => {
+      let dbReviews = dbRequest.result;
+      let tx = dbReviews.transaction(["reviews"]);
+      let store = tx.objectStore("reviews");
+      let index = store.index("restaurant_id");
+
+      let reviewsFromDBbyId = index.get(id);
+      reviewsFromDBbyId.onsuccess = () => {
+        restaurant.reviews = reviewsFromDBbyId.result;
+        console.log("from showCachedReviews: ", restaurant.reviews);
+        callback(null, restaurant);
+      }
+    }
+    dbRequest.onerror = () => {
+      console.log("There was an error accessing the reviews DB.");
+    }
+  }
 
   /***************************************************************/
   /**
@@ -130,8 +167,8 @@ class DataHandler {
       } else {
         const restaurant = restaurants.find(r => r.id == id);
         if (restaurant) {
-          // Got the restaurant
-          callback(null, restaurant);
+          //Fetch reviews
+          DataHandler.fetchReviewsById(id, restaurant, callback);          
         } else {
           // Restaurant does not exist in the database
           callback("Restaurant does not exist", null);

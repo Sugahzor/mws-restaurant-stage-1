@@ -1,5 +1,6 @@
 let restaurant;
 var map;
+let id;
 
 /* Added for working offline */
 document.addEventListener("DOMContentLoaded", event => {
@@ -9,6 +10,7 @@ document.addEventListener("DOMContentLoaded", event => {
       .then(registration => console.log("SW registered", registration))
       .catch(e => console.log("Registration failed :(", e));
   }
+  id = getParameterByName("id");
   fetchRestaurantFromURL(restaurant => {
     fillBreadcrumb();
   });
@@ -42,7 +44,6 @@ fetchRestaurantFromURL = callback => {
     callback(null, self.restaurant);
     return;
   }
-  const id = getParameterByName("id");
   if (!id) {
     // no id found in URL
     error = "No restaurant id in URL";
@@ -90,7 +91,7 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
  */
 fillRestaurantHoursHTML = (
   operatingHours = self.restaurant.operating_hours
-) => { 
+) => {
   const hours = document.getElementById("restaurant-hours");
   for (let key in operatingHours) {
     const row = document.createElement("tr");
@@ -119,6 +120,11 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
   title.innerHTML = "Reviews";
   container.appendChild(title);
 
+  const addButton = document.createElement("button");
+  addButton.setAttribute("tabindex", "0");
+  addButton.innerHTML = "Add a review";
+  container.appendChild(addButton);
+
   if (!reviews) {
     const noReviews = document.createElement("p");
     noReviews.innerHTML = "No reviews yet!";
@@ -136,13 +142,15 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
  * Create review HTML and add it to the webpage.
  */
 createReviewHTML = review => {
+
+  console.log(review);
   const li = document.createElement("li");
   const name = document.createElement("p");
   name.innerHTML = review.name;
   li.appendChild(name);
 
   const date = document.createElement("p");
-  date.innerHTML = review.date;
+  date.innerHTML = formatDate(review.updatedAt);
   li.appendChild(date);
 
   const rating = document.createElement("p");
@@ -179,3 +187,11 @@ getParameterByName = (name, url) => {
   if (!results[2]) return "";
   return decodeURIComponent(results[2].replace(/\+/g, " "));
 };
+
+formatDate = (unix_timestamp) => {
+  // Date formatting thanks to https://stackoverflow.com/questions/847185/convert-a-unix-timestamp-to-time-in-javascript
+
+  let date = new Date(unix_timestamp * 1000);
+  let options = { weekday: "long", month: "long", day: "numeric" };  
+  return (date.toLocaleDateString("en-US", options));
+}
