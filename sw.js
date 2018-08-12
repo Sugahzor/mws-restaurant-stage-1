@@ -1,10 +1,14 @@
-let staticCacheName = "restaurants-static-v3_44";
+let staticCacheName = "restaurants-static-v3_48";
 let urlsToCache = [
   "./",
   "index.html",  
   "restaurant.html",
+  "review-form.html",
   "data/manifest.json",
-  "css/styles.css",
+  "css/critical.css",
+  "css/index.css",
+  "css/restaurant.css",
+  "css/review-form.css",
   "data/restaurants.json",
   "js/data_handler.js",
   "js/main.js",
