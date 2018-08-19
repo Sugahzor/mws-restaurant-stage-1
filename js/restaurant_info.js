@@ -120,10 +120,11 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
   title.innerHTML = "Reviews";
   container.appendChild(title);
 
-  const addButton = document.createElement("button");
-  addButton.setAttribute("tabindex", "0");
-  addButton.innerHTML = "Add a review";
-  container.appendChild(addButton);
+  const addReview = document.createElement("a");
+  addReview.setAttribute("tabindex", "0");
+  addReview.innerHTML = "Add a review";
+  addReview.href = `./review-form.html?id=${id}`;
+  container.appendChild(addReview);
 
   if (!reviews) {
     const noReviews = document.createElement("p");
