@@ -74,7 +74,7 @@
 
 .inside #footer {
     bottom: 0;
-    position: absolute;
+    /* position: absolute; */
     width: 100%;
 }
 
@@ -126,6 +126,7 @@
 }
 
 #reviews-container h4 {
+    display: inline-block;
     color: #b34f00;
     font-size: 24pt;
     font-weight: 300;
@@ -207,6 +208,34 @@ button {
 
 #restaurant-hours td {
     color: #666;
+}
+
+/* Reviews Form*/
+#form-container {
+    max-width: 80%;
+    margin: 0 auto;
+    padding-top: 130px;
+}
+#form-container h2 {
+    position: absolute;
+    right: 14%;
+    font-weight: 600;
+}
+.form-item {
+    margin: 20px 0;
+}
+.field-description {
+    display: block;
+}
+#reviewer-name {
+    width: 60%;
+}
+textarea {
+    width: 60%;
+    min-height: 150px;
+}
+.not-visible {
+    display: none;
 }
 
 /*

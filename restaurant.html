@@ -5,7 +5,7 @@
   <title>Restaurant Info</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta charset="utf-8">
-  <meta name="theme-color" content="#444444"/>
+  <meta name="theme-color" content="#444444" />
   <link rel="manifest" href="/data/manifest.json">
   <!-- Normalize.css for better cross-browser consistency -->
   <link rel="stylesheet" src="//normalize-css.googlecode.com/svn/trunk/normalize.css" />
@@ -62,6 +62,35 @@
   </main>
   <!-- End main -->
 
+  <section id="form-container" class="not-visible" role="form">
+    <!-- <div class="form"> -->
+    <h2 tabindex="0">Add your review</h2>
+    <form>
+      <div class="form-item">
+        <label for="name" class="field-description">Your name: </label>
+        <input type="text" name="name" class="reviewer-name" required>
+      </div>
+      <div class="form-item">
+        <span class="field-description">Your overall rating:</span>
+        <select class="select-rating" name="rating" size="1">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5" selected="selected">5</option>
+        </select>
+      </div>
+      <div class="form-item">
+        <label for="review-text" class="field-description">Your review: </label>
+        <textarea type="review-text" name="review-text" class="review-text" required></textarea>
+      </div>
+      <div class="form-item">
+        <button onclick="saveForm(event)">Submit</button>
+        <button onclick="toggleReviewForm()">Cancel</button>
+      </div>
+    </form>
+  </section>
+
   <!-- Beginning footer -->
   <footer id="footer">
     Copyright (c) 2017
@@ -77,7 +106,7 @@
   <!-- Main javascript file -->
   <script type="application/javascript" src="js/restaurant_info.js"></script>
   <!-- Google Maps -->
-  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCEgBrxO3GXUAHRV-UxwsAQaduQn_bMxLg&libraries=places&callback=initMap"></script>
+  <script defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCEgBrxO3GXUAHRV-UxwsAQaduQn_bMxLg&libraries=places&callback=initMap"></script>
   <!-- End scripts -->
 
 </body>

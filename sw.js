@@ -1,14 +1,12 @@
-let staticCacheName = "restaurants-static-v3_50";
+let staticCacheName = "restaurants-static-v4_01";
 let urlsToCache = [
   "./",
-  "index.html",  
+  "index.html",
   "restaurant.html",
-  "review-form.html",
   "data/manifest.json",
   "css/critical.css",
   "css/index.css",
   "css/restaurant.css",
-  "css/review-form.css",
   "data/restaurants.json",
   "js/data_handler.js",
   "js/main.js",
@@ -29,9 +27,9 @@ let urlsToCache = [
 self.addEventListener("install", event => {
   event.waitUntil(
     caches
-      .open(staticCacheName)
-      .then(cache => cache.addAll(urlsToCache))
-      .then(self.skipWaiting())
+    .open(staticCacheName)
+    .then(cache => cache.addAll(urlsToCache))
+    .then(self.skipWaiting())
   );
 });
 

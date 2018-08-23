@@ -1,13 +1,30 @@
 let restaurant;
 var map;
 let id;
+let duplicate = false;
 
 /* Added for working offline */
 document.addEventListener("DOMContentLoaded", event => {
   if (navigator.serviceWorker) {
     navigator.serviceWorker
       .register("sw.js")
-      .then(registration => console.log("SW registered", registration))
+      .then(registration => {
+        console.log("SW registered", registration);
+        if (!navigator.serviceWorker.controller) {
+          return;
+        }
+        if (registration.waiting) {
+          console.log("Notify user update is ready so refresh");
+          return;
+        }
+        if (registration.installing) {
+          trackSWInstalling(registration.installing);
+          return;
+        }
+        registration.addEventListener("updatefound", () => {
+          trackSWInstalling(registration.installing);
+        })
+      })
       .catch(e => console.log("Registration failed :(", e));
   }
   id = getParameterByName("id");
@@ -15,6 +32,14 @@ document.addEventListener("DOMContentLoaded", event => {
     fillBreadcrumb();
   });
 });
+
+function trackSWInstalling(worker) {
+  worker.addEventListener("statechange", () => {
+    if (worker.state === "installed") {
+      console.log("Notify user updates are ready");
+    }
+  })
+}
 /**
  * Initialize Google map, called from HTML.
  */
@@ -56,6 +81,7 @@ fetchRestaurantFromURL = callback => {
         return;
       }
       fillRestaurantHTML();
+      duplicate = true;
       callback(null, restaurant);
     });
   }
@@ -78,12 +104,13 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   const cuisine = document.getElementById("restaurant-cuisine");
   cuisine.innerHTML = restaurant.cuisine_type;
 
-  // fill operating hours
-  if (restaurant.operating_hours) {
-    fillRestaurantHoursHTML();
+  if (!duplicate) { // fill operating hours
+    if (restaurant.operating_hours) {
+      fillRestaurantHoursHTML();
+    }
+    // fill reviews
+    fillReviewsHTML();
   }
-  // fill reviews
-  fillReviewsHTML();
 };
 
 /**
@@ -121,9 +148,10 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
   container.appendChild(title);
 
   const addReview = document.createElement("a");
+  addReview.setAttribute("onclick", "addUserReview()");
   addReview.setAttribute("tabindex", "0");
   addReview.innerHTML = "Add a review";
-  addReview.href = `./review-form.html?id=${id}`;
+  addReview.href = "#form-container";
   container.appendChild(addReview);
 
   if (!reviews) {
@@ -138,6 +166,37 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
   });
   container.appendChild(ul);
 };
+
+addUserReview = () => {
+  let reviewForm = document.querySelector("#form-container");
+  reviewForm.classList.toggle("not-visible");
+}
+
+saveForm = (e) => {
+  e.preventDefault();
+  let createdAt = Date.now();
+  let userName = document.querySelector(".reviewer-name").value;
+  let rating = document.querySelector(".select-rating").value;
+  let userReview = document.querySelector(".review-text").value;
+
+  let newReview = {
+    comments: userReview,
+    createdAt: createdAt,
+    name: userName,
+    rating: rating,
+    restaurant_id: id,
+    updatedAt: createdAt
+  }
+  console.log(newReview);
+  fillReviewsHTML([newReview]);
+  addUserReview();
+  document.querySelector("form").reset();
+  // if (navigator.onLine) {
+  //     // post the shit
+  //     return;
+  // }
+  // DataHandler.updateCachedReviews(newReview);
+}
 
 /**
  * Create review HTML and add it to the webpage.
@@ -193,6 +252,10 @@ formatDate = (unix_timestamp) => {
   // Date formatting thanks to https://stackoverflow.com/questions/847185/convert-a-unix-timestamp-to-time-in-javascript
 
   let date = new Date(unix_timestamp * 1000);
-  let options = { weekday: "long", month: "long", day: "numeric" };  
+  let options = {
+    weekday: "long",
+    month: "long",
+    day: "numeric"
+  };
   return (date.toLocaleDateString("en-US", options));
 }

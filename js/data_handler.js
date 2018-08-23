@@ -1,7 +1,3 @@
-/**
- * Common database helper functions.
- */
-// DBHelper
 class DataHandler {
 
   /* FETCH RESTAURANTS FROM THE SERVER OR INDEXEDB IF OFFLINE*/
@@ -13,7 +9,6 @@ class DataHandler {
       fetch("http://localhost:1337/restaurants/")
         .then(response => response.json())
         .then(restaurants => {
-          // console.log(restaurants);
           window.restaurants = restaurants;
           /* initialise database the first time it's called - onupgradeneeded will fire */
           this.initDB();
@@ -35,7 +30,6 @@ class DataHandler {
         .then(response => response.json())
         .then(reviewsById => {
           restaurant.reviews = reviewsById;
-          // Got the restaurant and it's reviews
           callback(null, restaurant);
         })
         .catch(err => console.log("There was an error: ", err));
@@ -49,7 +43,6 @@ class DataHandler {
       .then(reviews => {
         window.reviews = reviews;
         this.initReviewsDB();
-        // console.log(reviews);
       })
   }
 
@@ -66,7 +59,9 @@ class DataHandler {
       let objectStore = db.createObjectStore("reviews", {
         keyPath: "id"
       });
-      objectStore.createIndex("restaurant_id", "restaurant_id", { unique: false });
+      objectStore.createIndex("restaurant_id", "restaurant_id", {
+        unique: false
+      });
       objectStore.transaction.oncomplete = event => {
         let reviewsObjectStore = db
           .transaction("reviews", "readwrite")
@@ -79,7 +74,6 @@ class DataHandler {
   }
 
   /****************** DB implementation ******************/
-  /***** DB init with values *******/
   static initDB() {
     if (!navigator.serviceWorker) {
       return Promise.resolve();
@@ -150,8 +144,34 @@ class DataHandler {
       console.log("There was an error accessing the reviews DB.");
     }
   }
+// ******************************************************
+  static updateCachedReviews(newReview) {
+    console.log("called");
+    const dbName = "Reviews-DB";
+    let dbRequest = window.indexedDB.open(dbName, 1);
+    let reviewsFromDB = [];
 
-  /***************************************************************/
+    dbRequest.onsuccess = () => {
+      let dbReviews = dbRequest.result;
+      let tx = dbReviews.transaction(["reviews"]);
+      let store = tx.objectStore("reviews");
+      let index = store.index("restaurant_id");
+
+      let reviewsFromDBbyId = index.get(id);
+      reviewsFromDBbyId.onsuccess = () => {
+        // restaurant.reviews = reviewsFromDBbyId.result;
+        // console.log("from showCachedReviews: ", restaurant.reviews);
+        // callback(null, restaurant);
+        console.log("WAAAAAAAAA: ", reviewsFromDBbyId);
+        reviewsFromDBbyId.add(review);
+      
+      }
+    }
+    dbRequest.onerror = () => {
+      console.log("There was an error accessing the reviews DB.");
+    }
+  }
+  // ************************************************************
   /**
    * Fetch a restaurant by its ID.
    */
@@ -160,7 +180,6 @@ class DataHandler {
     if (!navigator.onLine) {
       DataHandler.showCachedRestaurants(callback)
     }
-    // fetch all restaurants with proper error handling.
     DataHandler.fetchRestaurants((error, restaurants) => {
       if (error) {
         callback(error, null);
@@ -168,9 +187,8 @@ class DataHandler {
         const restaurant = restaurants.find(r => r.id == id);
         if (restaurant) {
           //Fetch reviews
-          DataHandler.fetchReviewsById(id, restaurant, callback);          
+          DataHandler.fetchReviewsById(id, restaurant, callback);
         } else {
-          // Restaurant does not exist in the database
           callback("Restaurant does not exist", null);
         }
       }
@@ -181,7 +199,6 @@ class DataHandler {
    * Fetch restaurants by a cuisine type with proper error handling.
    */
   static fetchRestaurantByCuisine(cuisine, callback) {
-    // Fetch all restaurants  with proper error handling
     DataHandler.fetchRestaurants((error, restaurants) => {
       if (error) {
         callback(error, null);
@@ -193,11 +210,7 @@ class DataHandler {
     });
   }
 
-  /**
-   * Fetch restaurants by a neighborhood with proper error handling.
-   */
   static fetchRestaurantByNeighborhood(neighborhood, callback) {
-    // Fetch all restaurants
     DataHandler.fetchRestaurants((error, restaurants) => {
       if (error) {
         callback(error, null);
@@ -209,15 +222,11 @@ class DataHandler {
     });
   }
 
-  /**
-   * Fetch restaurants by a cuisine and a neighborhood with proper error handling.
-   */
   static fetchRestaurantByCuisineAndNeighborhood(
     cuisine,
     neighborhood,
     callback
   ) {
-    // Fetch all restaurants
     DataHandler.fetchRestaurants((error, restaurants) => {
       if (error) {
         callback(error, null);
@@ -309,15 +318,3 @@ class DataHandler {
     return marker;
   }
 }
-
-
-
-// POST request:
-// fetch('url', {
-//   method: 'POST',
-//   body: JSON.stringify(the data to POST),
-//   headers: { 'content-type': 'application/json' }
-// })
-// .then(response => response.json())
-// .catch(error => { console.log(error); 
-// });
