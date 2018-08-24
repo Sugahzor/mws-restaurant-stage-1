@@ -148,7 +148,7 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
   container.appendChild(title);
 
   const addReview = document.createElement("a");
-  addReview.setAttribute("onclick", "addUserReview()");
+  addReview.setAttribute("onclick", "toggleReviewForm()");
   addReview.setAttribute("tabindex", "0");
   addReview.innerHTML = "Add a review";
   addReview.href = "#form-container";
@@ -167,7 +167,7 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
   container.appendChild(ul);
 };
 
-addUserReview = () => {
+toggleReviewForm = () => {
   let reviewForm = document.querySelector("#form-container");
   reviewForm.classList.toggle("not-visible");
 }
@@ -189,7 +189,8 @@ saveForm = (e) => {
   }
   console.log(newReview);
   fillReviewsHTML([newReview]);
-  addUserReview();
+  DataHandler.updateCachedReviews(newReview);
+  toggleReviewForm();
   document.querySelector("form").reset();
   // if (navigator.onLine) {
   //     // post the shit

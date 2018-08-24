@@ -122,6 +122,7 @@ class DataHandler {
       console.log("There was an error accessing the DB.");
     }
   }
+  
   static showCachedReviews(id, restaurant, callback) {
     const dbName = "Reviews-DB";
     let dbRequest = window.indexedDB.open(dbName, 1);
@@ -146,25 +147,21 @@ class DataHandler {
   }
 // ******************************************************
   static updateCachedReviews(newReview) {
+    let newReviewArr = [newReview];
     console.log("called");
     const dbName = "Reviews-DB";
     let dbRequest = window.indexedDB.open(dbName, 1);
-    let reviewsFromDB = [];
 
     dbRequest.onsuccess = () => {
       let dbReviews = dbRequest.result;
-      let tx = dbReviews.transaction(["reviews"]);
+      let tx = dbReviews.transaction(["reviews"], "readwrite");
       let store = tx.objectStore("reviews");
       let index = store.index("restaurant_id");
-
       let reviewsFromDBbyId = index.get(id);
-      reviewsFromDBbyId.onsuccess = () => {
-        // restaurant.reviews = reviewsFromDBbyId.result;
-        // console.log("from showCachedReviews: ", restaurant.reviews);
-        // callback(null, restaurant);
-        console.log("WAAAAAAAAA: ", reviewsFromDBbyId);
-        reviewsFromDBbyId.add(review);
-      
+
+      let objStoreRequest = reviewsFromDBbyId.add(newReviewArr[0]);    
+      objStoreRequest.onsuccess = () => {
+        console.log("WAAAAAAAAA: ", reviewsFromDBbyId);    
       }
     }
     dbRequest.onerror = () => {
@@ -176,29 +173,25 @@ class DataHandler {
    * Fetch a restaurant by its ID.
    */
   static fetchRestaurantById(id, callback) {
-
     if (!navigator.onLine) {
-      DataHandler.showCachedRestaurants(callback)
+      DataHandler.showCachedRestaurants(callback);
+    } else {
+      const rootUrl = `http://localhost:1337/restaurants/${id}`;
+      console.log(rootUrl, "from fetchRestaurantById");
+      fetch(rootUrl)
+        .then(response => response.json())
+        .then(restaurantById => {
+          DataHandler.fetchReviewsById(id, restaurantById, callback);
+        })
+        .catch(err => console.log("There was an error: ", err));
     }
-    DataHandler.fetchRestaurants((error, restaurants) => {
-      if (error) {
-        callback(error, null);
-      } else {
-        const restaurant = restaurants.find(r => r.id == id);
-        if (restaurant) {
-          //Fetch reviews
-          DataHandler.fetchReviewsById(id, restaurant, callback);
-        } else {
-          callback("Restaurant does not exist", null);
-        }
-      }
-    });
   }
 
   /**
    * Fetch restaurants by a cuisine type with proper error handling.
    */
   static fetchRestaurantByCuisine(cuisine, callback) {
+    
     DataHandler.fetchRestaurants((error, restaurants) => {
       if (error) {
         callback(error, null);
