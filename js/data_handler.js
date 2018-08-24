@@ -294,7 +294,7 @@ class DataHandler {
     if (!restaurant.photograph) {
       restaurant.photograph = restaurant.id;
     }
-    return `/img/${restaurant.photograph}.jpg`;
+    return `/img/${restaurant.photograph}.webp`;
   }
 
   /**
