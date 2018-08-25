@@ -210,30 +210,43 @@ button {
     color: #666;
 }
 
+#reviews-container a {
+    position: absolute;
+    right: 15%;
+    font-weight: 600;
+}
+
 /* Reviews Form*/
+
 #form-container {
     max-width: 80%;
     margin: 0 auto;
     padding-top: 130px;
 }
+
 #form-container h2 {
     position: absolute;
     right: 14%;
     font-weight: 600;
 }
+
 .form-item {
     margin: 20px 0;
 }
+
 .field-description {
     display: block;
 }
+
 #reviewer-name {
     width: 60%;
 }
+
 textarea {
     width: 60%;
     min-height: 150px;
 }
+
 .not-visible {
     display: none;
 }

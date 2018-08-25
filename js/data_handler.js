@@ -85,7 +85,8 @@ class DataHandler {
     request.onupgradeneeded = event => {
       db = event.target.result;
       let objectStore = db.createObjectStore("restaurants", {
-        keyPath: "id"
+        keyPath: "id",
+        autoIncrement: true
       });
       objectStore.transaction.oncomplete = event => {
         let restaurantsObjectStore = db
@@ -122,7 +123,7 @@ class DataHandler {
       console.log("There was an error accessing the DB.");
     }
   }
-  
+
   static showCachedReviews(id, restaurant, callback) {
     const dbName = "Reviews-DB";
     let dbRequest = window.indexedDB.open(dbName, 1);
@@ -137,7 +138,6 @@ class DataHandler {
       let reviewsFromDBbyId = index.get(id);
       reviewsFromDBbyId.onsuccess = () => {
         restaurant.reviews = reviewsFromDBbyId.result;
-        console.log("from showCachedReviews: ", restaurant.reviews);
         callback(null, restaurant);
       }
     }
@@ -145,23 +145,25 @@ class DataHandler {
       console.log("There was an error accessing the reviews DB.");
     }
   }
-// ******************************************************
+  // ******************************************************
   static updateCachedReviews(newReview) {
-    let newReviewArr = [newReview];
-    console.log("called");
     const dbName = "Reviews-DB";
-    let dbRequest = window.indexedDB.open(dbName, 1);
+    let dbRequest = window.indexedDB.open(dbName, 2);
 
     dbRequest.onsuccess = () => {
       let dbReviews = dbRequest.result;
       let tx = dbReviews.transaction(["reviews"], "readwrite");
       let store = tx.objectStore("reviews");
-      let index = store.index("restaurant_id");
-      let reviewsFromDBbyId = index.get(id);
 
-      let objStoreRequest = reviewsFromDBbyId.add(newReviewArr[0]);    
-      objStoreRequest.onsuccess = () => {
-        console.log("WAAAAAAAAA: ", reviewsFromDBbyId);    
+      // let index = store.index("restaurant_id");
+      // let reviewsFromDBbyId = index.get(id);
+      // let objStoreRequest = reviewsFromDBbyId.add(newReview);
+      let objectStoreRequest = store.add({
+        value: newReview,
+        id: newReview.restaurant_id
+      });
+      objectStoreRequest.onsuccess = () => {
+        console.log("Success adding a review to IDB");
       }
     }
     dbRequest.onerror = () => {
@@ -177,7 +179,6 @@ class DataHandler {
       DataHandler.showCachedRestaurants(callback);
     } else {
       const rootUrl = `http://localhost:1337/restaurants/${id}`;
-      console.log(rootUrl, "from fetchRestaurantById");
       fetch(rootUrl)
         .then(response => response.json())
         .then(restaurantById => {
@@ -191,7 +192,7 @@ class DataHandler {
    * Fetch restaurants by a cuisine type with proper error handling.
    */
   static fetchRestaurantByCuisine(cuisine, callback) {
-    
+
     DataHandler.fetchRestaurants((error, restaurants) => {
       if (error) {
         callback(error, null);

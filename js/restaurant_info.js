@@ -150,6 +150,7 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
   const addReview = document.createElement("a");
   addReview.setAttribute("onclick", "toggleReviewForm()");
   addReview.setAttribute("tabindex", "0");
+  addReview.setAttribute("aria-label", `Add your review for ${self.restaurant.name}`);
   addReview.innerHTML = "Add a review";
   addReview.href = "#form-container";
   container.appendChild(addReview);
@@ -187,24 +188,27 @@ saveForm = (e) => {
     restaurant_id: id,
     updatedAt: createdAt
   }
-  console.log(newReview);
   fillReviewsHTML([newReview]);
-  DataHandler.updateCachedReviews(newReview);
+  // DataHandler.updateCachedReviews(newReview);
   toggleReviewForm();
   document.querySelector("form").reset();
-  // if (navigator.onLine) {
-  //     // post the shit
-  //     return;
-  // }
-  // DataHandler.updateCachedReviews(newReview);
+  if (navigator.onLine) {
+    let postUrl = "http://localhost:1337/reviews/";
+    fetch(postUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+      },
+      body: JSON.stringify(newReview),
+    });
+  }
+  DataHandler.updateCachedReviews(newReview);
 }
 
 /**
  * Create review HTML and add it to the webpage.
  */
 createReviewHTML = review => {
-
-  console.log(review);
   const li = document.createElement("li");
   const name = document.createElement("p");
   name.innerHTML = review.name;
