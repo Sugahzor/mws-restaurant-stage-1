@@ -6,7 +6,7 @@ class DataHandler {
       DataHandler.showCachedRestaurants(callback);
     } else {
       const rootUrl = "http://localhost:1337/restaurants";
-      fetch("http://localhost:1337/restaurants/")
+      fetch(rootUrl)
         .then(response => response.json())
         .then(restaurants => {
           window.restaurants = restaurants;
@@ -20,6 +20,14 @@ class DataHandler {
         });
     }
   }
+
+  static getFavoriteRestaurants() {
+    let rootUrl = "http://localhost:1337/restaurants/?is_favorite=true";
+    if (navigator.onLine) {
+      return fetch(rootUrl)
+        .then(response => response.json())
+    }
+  }  
 
   static fetchReviewsById(id, restaurant, callback) {
     if (!navigator.onLine) {

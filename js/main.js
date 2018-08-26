@@ -1,4 +1,4 @@
-let restaurants, reviews, neighborhoods, cuisines;
+let restaurants, reviews, neighborhoods, cuisines, favorites;
 var map;
 var markers = [];
   // Lazy-loading Intersection Observable :
@@ -23,7 +23,9 @@ document.addEventListener("DOMContentLoaded", event => {
   }
   fetchNeighborhoods();
   fetchCuisines();
-  /* Added for working offline */
+  DataHandler.getFavoriteRestaurants().then(result => {
+    favorites = result;
+  });
   updateRestaurants();
   DataHandler.fetchReviews();
 });
@@ -213,6 +215,13 @@ createRestaurantHTML = restaurant => {
   const name = document.createElement("h3");
   name.innerHTML = restaurant.name;
   li.append(name);
+
+  const favorite = document.createElement("span");
+  favorite.innerHTML = "❤";
+  if (restaurant.is_favorite === "true") {
+    favorite.className = "red";
+  }
+  li.append(favorite);
 
   const neighborhood = document.createElement("p");
   neighborhood.innerHTML = restaurant.neighborhood;

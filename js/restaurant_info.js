@@ -2,6 +2,7 @@ let restaurant;
 var map;
 let id;
 let duplicate = false;
+let favIcon;
 
 /* Added for working offline */
 document.addEventListener("DOMContentLoaded", event => {
@@ -28,6 +29,7 @@ document.addEventListener("DOMContentLoaded", event => {
       .catch(e => console.log("Registration failed :(", e));
   }
   id = getParameterByName("id");
+  favIcon = document.querySelector("#favicon");
   fetchRestaurantFromURL(restaurant => {
     fillBreadcrumb();
   });
@@ -104,7 +106,11 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   const cuisine = document.getElementById("restaurant-cuisine");
   cuisine.innerHTML = restaurant.cuisine_type;
 
-  if (!duplicate) { // fill operating hours
+  if (!duplicate) {
+    if (restaurant.is_favorite) {
+      favIcon.classList.add("red");
+    }
+     // fill operating hours
     if (restaurant.operating_hours) {
       fillRestaurantHoursHTML();
     }
@@ -255,7 +261,6 @@ getParameterByName = (name, url) => {
 
 formatDate = (unix_timestamp) => {
   // Date formatting thanks to https://stackoverflow.com/questions/847185/convert-a-unix-timestamp-to-time-in-javascript
-
   let date = new Date(unix_timestamp * 1000);
   let options = {
     weekday: "long",
@@ -263,4 +268,21 @@ formatDate = (unix_timestamp) => {
     day: "numeric"
   };
   return (date.toLocaleDateString("en-US", options));
+}
+
+addToFavorites = () => {  
+  if (favIcon.classList.contains("red")) {
+    favIcon.classList.toggle("red");
+    fetch(`http://localhost:1337/restaurants/${id}/?is_favorite=false`, {
+        method: "PUT"
+      })
+      .then(res => console.log(res));
+
+  } else {
+    favIcon.classList.toggle("red");
+    fetch(`http://localhost:1337/restaurants/${id}/?is_favorite=true`, {
+        method: "PUT"
+      })
+      .then(res => console.log(res));
+  }
 }

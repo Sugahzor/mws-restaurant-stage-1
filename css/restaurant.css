@@ -84,7 +84,7 @@
     font-size: 20pt;
     font-weight: 200;
     letter-spacing: 0;
-    margin: 15px 0 30px;
+    margin: 15px 0 15px;
     text-transform: uppercase;
     line-height: 1.2em;
 }
@@ -251,6 +251,16 @@ textarea {
     display: none;
 }
 
+.fav {
+    width: 50%;
+    display: flex;
+    justify-content: center;
+    margin: 10px 0;
+}
+#favicon:hover {
+    cursor: pointer;
+}
+
 /*
 *
 * ************** Responsive implementation************
@@ -377,6 +387,9 @@ textarea {
         margin-top: 30px;
         order: 3;
         align-self: flex-start;
+    }
+    .fav {
+        order: 6;
     }
     #restaurant-hours tr {
         display: flex;
