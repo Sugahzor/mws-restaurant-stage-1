@@ -6,13 +6,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta charset="utf-8">
   <meta name="theme-color" content="#444444" />
-  <link rel="manifest" href="/data/manifest.json">
+  <link rel="manifest" href="data/manifest.json">
   <!-- Normalize.css for better cross-browser consistency -->
   <link rel="stylesheet" src="//normalize-css.googlecode.com/svn/trunk/normalize.css" />
   <!-- Main CSS file -->
-  <link rel="stylesheet" href="css/critical.css">
-  <link rel="stylesheet" href="css/restaurant.css">
-  <!-- <link rel="stylesheet" href="css/styles.css" type="text/css"> -->
+  <link rel="stylesheet" href="css/restaurantmin.css">
 
 </head>
 
@@ -49,7 +47,7 @@
       <img id="restaurant-img">
       <p id="restaurant-cuisine"></p>
       <p id="restaurant-address"></p>
-      <table id="restaurant-hours" aria-label="restaurant hours"  ></table>
+      <table id="restaurant-hours" aria-label="restaurant hours"></table>
       <a href="#reviews-container" class="skip-link">Skip map</a>
     </section>
     <!-- end restaurant -->
@@ -86,7 +84,8 @@
       </div>
       <div class="form-item">
         <label for="review-text" id="review-label" class="field-description">Your review: </label>
-        <textarea aria-labelledby="review-label" type="review-text" name="review-text" class="review-text" aria-multiline="true" required></textarea>
+        <textarea aria-labelledby="review-label" type="review-text" name="review-text" class="review-text" aria-multiline="true"
+          required></textarea>
       </div>
       <div class="form-item">
         <button onclick="saveForm(event)">Submit</button>
@@ -105,10 +104,8 @@
   <!-- End footer -->
 
   <!-- Beginning scripts -->
-  <!-- Database helpers -->
-  <script type="text/javascript" src="js/data_handler.js"></script>
   <!-- Main javascript file -->
-  <script type="application/javascript" src="js/restaurant_info.js"></script>
+  <script type="application/javascript" charset="utf-8" src="js/restaurantmin.js"></script>
   <!-- Google Maps -->
   <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCEgBrxO3GXUAHRV-UxwsAQaduQn_bMxLg&libraries=places&callback=initMap"></script>
   <!-- End scripts -->
