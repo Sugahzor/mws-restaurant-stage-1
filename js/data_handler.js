@@ -21,14 +21,6 @@ class DataHandler {
     }
   }
 
-  static getFavoriteRestaurants() {
-    let rootUrl = "http://localhost:1337/restaurants/?is_favorite=true";
-    if (navigator.onLine) {
-      return fetch(rootUrl)
-        .then(response => response.json())
-    }
-  }  
-
   static fetchReviewsById(id, restaurant, callback) {
     if (!navigator.onLine) {
       DataHandler.showCachedReviews(id, callback);
@@ -65,7 +57,8 @@ class DataHandler {
     request.onupgradeneeded = event => {
       db = event.target.result;
       let objectStore = db.createObjectStore("reviews", {
-        keyPath: "id"
+        keyPath: "id",
+        autoIncrement: true
       });
       objectStore.createIndex("restaurant_id", "restaurant_id", {
         unique: false
@@ -153,31 +146,7 @@ class DataHandler {
       console.log("There was an error accessing the reviews DB.");
     }
   }
-  // ******************************************************
-  static updateCachedReviews(newReview) {
-    const dbName = "Reviews-DB";
-    let dbRequest = window.indexedDB.open(dbName, 2);
 
-    dbRequest.onsuccess = () => {
-      let dbReviews = dbRequest.result;
-      let tx = dbReviews.transaction(["reviews"], "readwrite");
-      let store = tx.objectStore("reviews");
-
-      // let index = store.index("restaurant_id");
-      // let reviewsFromDBbyId = index.get(id);
-      // let objStoreRequest = reviewsFromDBbyId.add(newReview);
-      let objectStoreRequest = store.add({
-        value: newReview,
-        id: newReview.restaurant_id
-      });
-      objectStoreRequest.onsuccess = () => {
-        console.log("Success adding a review to IDB");
-      }
-    }
-    dbRequest.onerror = () => {
-      console.log("There was an error accessing the reviews DB.");
-    }
-  }
   // ************************************************************
   /**
    * Fetch a restaurant by its ID.

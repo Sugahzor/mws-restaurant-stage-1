@@ -1,4 +1,4 @@
-let staticCacheName = "restaurants-static-v5_16";
+let staticCacheName = "restaurants-static-v6";
 let urlsToCache = [
   "./",
   "index.html",
@@ -22,7 +22,6 @@ let urlsToCache = [
   "img/9.webp",
   "img/10.webp"
 ];
-
 
 self.addEventListener("install", event => {
   event.waitUntil(

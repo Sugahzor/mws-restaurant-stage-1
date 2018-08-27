@@ -107,10 +107,10 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   cuisine.innerHTML = restaurant.cuisine_type;
 
   if (!duplicate) {
-    if (restaurant.is_favorite) {
+    if (restaurant.is_favorite === "true") {
       favIcon.classList.add("red");
     }
-     // fill operating hours
+    // fill operating hours
     if (restaurant.operating_hours) {
       fillRestaurantHoursHTML();
     }
@@ -195,20 +195,15 @@ saveForm = (e) => {
     updatedAt: createdAt
   }
   fillReviewsHTML([newReview]);
-  // DataHandler.updateCachedReviews(newReview);
   toggleReviewForm();
   document.querySelector("form").reset();
-  if (navigator.onLine) {
-    let postUrl = "http://localhost:1337/reviews/";
-    fetch(postUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json; charset=utf-8",
-      },
-      body: JSON.stringify(newReview),
-    });
+  if (!navigator.onLine) {
+    // add review to local storage
+    const localStorageAvailable = storageAvailable("localStorage");
+    if (localStorageAvailable) {
+      localStorage.setItem("offlineUserReview", JSON.stringify(newReview));
+    }
   }
-  DataHandler.updateCachedReviews(newReview);
 }
 
 /**
@@ -270,19 +265,61 @@ formatDate = (unix_timestamp) => {
   return (date.toLocaleDateString("en-US", options));
 }
 
-addToFavorites = () => {  
+addToFavorites = () => {
   if (favIcon.classList.contains("red")) {
-    favIcon.classList.toggle("red");
     fetch(`http://localhost:1337/restaurants/${id}/?is_favorite=false`, {
         method: "PUT"
-      })
-      .then(res => console.log(res));
-
+      });
   } else {
-    favIcon.classList.toggle("red");
     fetch(`http://localhost:1337/restaurants/${id}/?is_favorite=true`, {
         method: "PUT"
-      })
-      .then(res => console.log(res));
+      });
+  }
+  favIcon.classList.toggle("red");
+}
+
+function storageAvailable(type) {
+  try {
+    var storage = window[type],
+      x = "__storage_test__";
+    storage.setItem(x, x);
+    storage.removeItem(x);
+    return true;
+  } catch (e) {
+    return (
+      e instanceof DOMException &&
+      // everything except Firefox
+      (e.code === 22 ||
+        // Firefox
+        e.code === 1014 ||
+        // test name field too, because code might not be present
+        // everything except Firefox
+        e.name === "QuotaExceededError" ||
+        // Firefox
+        e.name === "NS_ERROR_DOM_QUOTA_REACHED") &&
+      // acknowledge QuotaExceededError only if there's something already stored
+      storage.length !== 0
+    );
   }
 }
+
+updateOnlineStatus = () => {
+  reviewToPost = JSON.parse(localStorage.getItem("offlineUserReview"));
+  if (reviewToPost && reviewToPost.restaurant_id === id) {
+    let postUrl = "http://localhost:1337/reviews/";
+    fetch(postUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+      },
+      body: JSON.stringify(reviewToPost),
+    });
+    localStorage.removeItem("offlineUserReview");
+  }
+}
+
+window.addEventListener('offline', function (e) {
+  console.log('offline');
+});
+
+window.addEventListener('online', updateOnlineStatus);
