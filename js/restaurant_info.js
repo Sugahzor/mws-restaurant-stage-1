@@ -33,6 +33,12 @@ document.addEventListener("DOMContentLoaded", event => {
   fetchRestaurantFromURL(restaurant => {
     fillBreadcrumb();
   });
+  window.addEventListener('offline', function (e) {
+    console.log('offline');
+  });
+  if (navigator.onLine) {
+    updateOnlineStatus();
+  }
 });
 
 function trackSWInstalling(worker) {
@@ -201,7 +207,7 @@ saveForm = (e) => {
     // add review to local storage
     const localStorageAvailable = storageAvailable("localStorage");
     if (localStorageAvailable) {
-      localStorage.setItem("offlineUserReview", JSON.stringify(newReview));
+      localStorage.setItem(`offlineUserReview${id}`, JSON.stringify(newReview));
     }
   }
 }
@@ -268,12 +274,12 @@ formatDate = (unix_timestamp) => {
 addToFavorites = () => {
   if (favIcon.classList.contains("red")) {
     fetch(`http://localhost:1337/restaurants/${id}/?is_favorite=false`, {
-        method: "PUT"
-      });
+      method: "PUT"
+    });
   } else {
     fetch(`http://localhost:1337/restaurants/${id}/?is_favorite=true`, {
-        method: "PUT"
-      });
+      method: "PUT"
+    });
   }
   favIcon.classList.toggle("red");
 }
@@ -304,7 +310,8 @@ function storageAvailable(type) {
 }
 
 updateOnlineStatus = () => {
-  reviewToPost = JSON.parse(localStorage.getItem("offlineUserReview"));
+  reviewToPost = JSON.parse(localStorage.getItem(`offlineUserReview${id}`));
+  console.log(reviewToPost);
   if (reviewToPost && reviewToPost.restaurant_id === id) {
     let postUrl = "http://localhost:1337/reviews/";
     fetch(postUrl, {
@@ -314,12 +321,7 @@ updateOnlineStatus = () => {
       },
       body: JSON.stringify(reviewToPost),
     });
-    localStorage.removeItem("offlineUserReview");
+    localStorage.removeItem(`offlineUserReview${id}`);
+    window.location.reload(true);
   }
 }
-
-window.addEventListener('offline', function (e) {
-  console.log('offline');
-});
-
-window.addEventListener('online', updateOnlineStatus);

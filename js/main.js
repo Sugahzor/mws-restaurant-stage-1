@@ -1,21 +1,21 @@
 let restaurants, reviews, neighborhoods, cuisines, favorites;
 var map;
 var markers = [];
-  // Lazy-loading Intersection Observable :
-  const intersectObservable = new IntersectionObserver(input => {
-    let imageElement = input[0].target;
-    if (input[0].intersectionRatio > 0 && imageElement.dataset.src) {
-      imageElement.setAttribute("src", imageElement.dataset.src);
-      intersectObservable.unobserve(input[0].target);
-    }
-  });
+// Lazy-loading Intersection Observable :
+const intersectObservable = new IntersectionObserver(input => {
+  let imageElement = input[0].target;
+  if (input[0].intersectionRatio > 0 && imageElement.dataset.src) {
+    imageElement.setAttribute("src", imageElement.dataset.src);
+    intersectObservable.unobserve(input[0].target);
+  }
+});
 /**
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
 document.addEventListener("DOMContentLoaded", event => {
-/**
-*     Service Worker init
-*/
+  /**
+   *     Service Worker init
+   */
   if (navigator.serviceWorker) {
     navigator.serviceWorker
       .register("sw.js")
@@ -23,9 +23,6 @@ document.addEventListener("DOMContentLoaded", event => {
   }
   fetchNeighborhoods();
   fetchCuisines();
-  DataHandler.getFavoriteRestaurants().then(result => {
-    favorites = result;
-  });
   updateRestaurants();
   DataHandler.fetchReviews();
 });
@@ -43,8 +40,8 @@ fetchNeighborhoods = () => {
       self.neighborhoods = neighborhoods;
       fillNeighborhoodsHTML();
     }
-  });  
- };
+  });
+};
 
 
 /**
@@ -91,7 +88,7 @@ fillCuisinesHTML = (cuisines = self.cuisines) => {
     }
     option.innerHTML = cuisine;
     option.value = cuisine;
-    select.append(option);    
+    select.append(option);
   });
 };
 
@@ -144,8 +141,12 @@ updateRestaurants = () => {
     }
   }
   /* If any data in localStorage, means user navigated back to main page from restaurant.html; else just use his current selection */
-  if (!cuisine) {cuisine = cSelect[cIndex].value}
-  if (!neighborhood) {neighborhood = nSelect[nIndex].value}
+  if (!cuisine) {
+    cuisine = cSelect[cIndex].value
+  }
+  if (!neighborhood) {
+    neighborhood = nSelect[nIndex].value
+  }
 
   /* TODO: FIX SELECT VALUE DISPLAY;  */
 
@@ -182,7 +183,7 @@ resetRestaurants = restaurants => {
 /**
  * Create all restaurants HTML (including no-results element) and add them to the webpage.
  */
-fillRestaurantsHTML = (restaurants = self.restaurants) => {  
+fillRestaurantsHTML = (restaurants = self.restaurants) => {
   const ul = document.getElementById("restaurants-list");
   ul.setAttribute("tabindex", "0");
   ul.setAttribute("aria-label", "restaurants list");
@@ -205,7 +206,7 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
 createRestaurantHTML = restaurant => {
   const li = document.createElement("li");
   li.setAttribute("aria-label", "restaurant details");
-  const image = document.createElement("img");  
+  const image = document.createElement("img");
   image.setAttribute("alt", `Restaurant ${restaurant.name} presentation photo`);
   image.className = "restaurant-img";
   image.dataset.src = DataHandler.imageUrlForRestaurant(restaurant);
@@ -238,7 +239,7 @@ createRestaurantHTML = restaurant => {
   );
   more.innerHTML = "View Details";
   more.href = DataHandler.urlForRestaurant(restaurant);
-  li.append(more);  
+  li.append(more);
 
   return li;
 };
@@ -281,5 +282,3 @@ function storageAvailable(type) {
     );
   }
 }
-
-
