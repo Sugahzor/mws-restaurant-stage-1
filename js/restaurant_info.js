@@ -33,12 +33,10 @@ document.addEventListener("DOMContentLoaded", event => {
   fetchRestaurantFromURL(restaurant => {
     fillBreadcrumb();
   });
-  window.addEventListener('offline', function (e) {
-    console.log('offline');
+  window.addEventListener("offline", () => {
+    console.log("offline");
   });
-  if (navigator.onLine) {
-    updateOnlineStatus();
-  }
+  window.addEventListener("online", updateOnlineStatus);
 });
 
 function trackSWInstalling(worker) {
@@ -313,7 +311,6 @@ function storageAvailable(type) {
 
 updateOnlineStatus = () => {
   reviewToPost = JSON.parse(localStorage.getItem(`offlineUserReview${id}`));
-  console.log(reviewToPost);
   if (reviewToPost && reviewToPost.restaurant_id === id) {
     let postUrl = "http://localhost:1337/reviews/";
     fetch(postUrl, {

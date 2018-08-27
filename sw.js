@@ -1,4 +1,4 @@
-let staticCacheName = "restaurants-static-v6_12";
+let staticCacheName = "restaurants-static-v7_06";
 let urlsToCache = [
   "./",
   "index.html",
@@ -47,7 +47,18 @@ self.addEventListener("fetch", event => {
         if (response) {
           return response;
         }
-        return fetch(event.request);
+        let fetchRequest = event.request.clone();
+        return fetch(fetchRequest).then(response => {
+          if (!response || response.status !== 200 || response.type !== "basic") {
+            return response;
+          }
+          if (fetchRequest.method === "GET") {
+            let responseToCache = response.clone();
+            caches.open(staticCacheName)
+              .then(cache => cache.put(event.request, responseToCache));
+          }
+          return response;
+        })
       })
     );
   }
