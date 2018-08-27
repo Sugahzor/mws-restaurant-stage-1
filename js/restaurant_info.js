@@ -142,6 +142,7 @@ fillRestaurantHoursHTML = (
     const time = document.createElement("td");
     time.innerHTML = operatingHours[key];
     row.appendChild(time);
+    row.setAttribute("tabindex", "0");
 
     hours.appendChild(row);
   }
@@ -217,6 +218,7 @@ saveForm = (e) => {
  */
 createReviewHTML = review => {
   const li = document.createElement("li");
+  li.setAttribute("tabindex", "0");
   const name = document.createElement("p");
   name.innerHTML = review.name;
   li.appendChild(name);

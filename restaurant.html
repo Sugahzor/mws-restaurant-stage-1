@@ -49,7 +49,7 @@
       <img id="restaurant-img">
       <p id="restaurant-cuisine"></p>
       <p id="restaurant-address"></p>
-      <table id="restaurant-hours"></table>
+      <table id="restaurant-hours" aria-label="restaurant hours"  ></table>
       <a href="#reviews-container" class="skip-link">Skip map</a>
     </section>
     <!-- end restaurant -->
@@ -69,13 +69,13 @@
   <section id="form-container" class="not-visible">
     <!-- <div class="form"> -->
     <h2 tabindex="0">Add your review</h2>
-    <form role="form">
+    <form>
       <div class="form-item">
-        <label for="name" class="field-description">Your name: </label>
-        <input type="text" name="name" class="reviewer-name" autofocus required>
+        <label for="name" id="name-label" class="field-description">Your name: </label>
+        <input aria-labelledby="name-label" type="text" name="name" class="reviewer-name" autofocus required>
       </div>
       <div class="form-item">
-        <span class="field-description">Your overall rating:</span>
+        <span class="field-description" tabindex="0">Your overall rating:</span>
         <select class="select-rating" name="rating" size="1" role="radiogroup">
           <option value="1" role="radio">1</option>
           <option value="2" role="radio">2</option>
@@ -85,8 +85,8 @@
         </select>
       </div>
       <div class="form-item">
-        <label for="review-text" class="field-description">Your review: </label>
-        <textarea type="review-text" name="review-text" class="review-text" aria-multiline="true" required></textarea>
+        <label for="review-text" id="review-label" class="field-description">Your review: </label>
+        <textarea aria-labelledby="review-label" type="review-text" name="review-text" class="review-text" aria-multiline="true" required></textarea>
       </div>
       <div class="form-item">
         <button onclick="saveForm(event)">Submit</button>
@@ -110,7 +110,7 @@
   <!-- Main javascript file -->
   <script type="application/javascript" src="js/restaurant_info.js"></script>
   <!-- Google Maps -->
-  <!-- <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCEgBrxO3GXUAHRV-UxwsAQaduQn_bMxLg&libraries=places&callback=initMap"></script> -->
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCEgBrxO3GXUAHRV-UxwsAQaduQn_bMxLg&libraries=places&callback=initMap"></script>
   <!-- End scripts -->
 
 </body>
