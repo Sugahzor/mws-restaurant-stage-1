@@ -64,6 +64,8 @@
 .restaurant-main #map-container {
     width: 50%;
     padding: 140px 40px 30px 0;
+    display: flex;
+    align-items: center;
 }
 
 .inside #map {
@@ -245,10 +247,6 @@ button {
 textarea {
     width: 60%;
     min-height: 150px;
-}
-
-.not-visible {
-    display: none;
 }
 
 .fav {

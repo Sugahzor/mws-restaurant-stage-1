@@ -327,3 +327,15 @@ updateOnlineStatus = () => {
     window.location.reload(true);
   }
 }
+
+loadMap = (event) => {
+  console.log(event)
+  let bodyTag = document.querySelector("body");
+  let scriptTag = document.createElement("script");
+  let map = document.querySelector("#map");
+  let btn = document.querySelector("#show-map");
+  btn.classList.add("not-visible");
+  map.classList.remove("not-visible");
+  scriptTag.setAttribute("src", "https://maps.googleapis.com/maps/api/js?key=AIzaSyCEgBrxO3GXUAHRV-UxwsAQaduQn_bMxLg&libraries=places&callback=initMap");
+  bodyTag.appendChild(scriptTag);
+}
