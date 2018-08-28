@@ -21,7 +21,7 @@ class DataHandler {
     }
   }
 
-  static fetchReviewsById(id, restaurant, callback) {
+  static fetchReviewsById(id, callback, restaurant) {
     if (!navigator.onLine) {
       DataHandler.showCachedReviews(id, callback);
     } else {
@@ -100,7 +100,7 @@ class DataHandler {
     };
   }
   /**** Retrieve and serve restaurants from our DB ****/
-  static showCachedRestaurants(callback) {
+  static showCachedRestaurants(callback, idArg) {
     const dbName = "Restaurants-DB";
     let dbRequest = window.indexedDB.open(dbName, 1);
     let restaurantsFromIDB = [];
@@ -116,7 +116,13 @@ class DataHandler {
           cursor.continue();
         } else {
           window.restaurants = restaurantsFromIDB;
-          callback(null, restaurantsFromIDB);
+          if (idArg) {
+            window.restaurant = restaurantsFromIDB[idArg-1];
+            window.restaurant.reviews = [];
+            callback(null, restaurantsFromIDB[idArg-1]);            
+          } else {
+            callback(null, restaurantsFromIDB);
+          }          
         }
       };
     };
@@ -125,21 +131,47 @@ class DataHandler {
     }
   }
 
-  static showCachedReviews(id, restaurant, callback) {
+  static showCachedReviews(id, callback) {
     const dbName = "Reviews-DB";
     let dbRequest = window.indexedDB.open(dbName, 1);
-    let reviewsFromDB = [];
+    let reviewsFromIDB = [];
 
     dbRequest.onsuccess = () => {
       let dbReviews = dbRequest.result;
-      let tx = dbReviews.transaction(["reviews"]);
+      let tx = dbReviews.transaction(["reviews"], "readonly");
       let store = tx.objectStore("reviews");
-      let index = store.index("restaurant_id");
 
-      let reviewsFromDBbyId = index.get(id);
-      reviewsFromDBbyId.onsuccess = () => {
-        restaurant.reviews = reviewsFromDBbyId.result;
-        callback(null, restaurant);
+      // let index = store.index("restaurant_id");
+      // let getRequest = index.get(id);      
+      // getRequest.onsuccess = () => {
+      //   // window.restaurant.reviews = reviewsFromDBbyId.result;
+      //   // callback(null, restaurant);
+      //   console.log(getRequest.result, "result from getRequest de index");
+      // }
+
+      // index.openCursor().onsuccess = event => {
+      //   let cursor = event.target.result;
+      //   if (cursor) {
+      //     if (cursor.key === id) {
+      //       console.log(cursor.value);
+      //       restaurant.reviews.push(cursor.value);
+      //     }
+      //     cursor.continue();
+      //   }
+      //   console.log(restaurant, "fxdjklghdfjkgh");
+      //   callback(null, restaurant);
+      // }
+      store.openCursor().onsuccess = event => {
+        let cursor = event.target.result;
+        if (cursor) {
+          console.log(cursor);
+          if (cursor.key === id) {
+            reviewsFromIDB.push(cursor.value);
+          }
+          cursor.continue();
+        } else {
+          windows.reviews = reviewsFromIDB
+        }
       }
     }
     dbRequest.onerror = () => {
@@ -153,13 +185,15 @@ class DataHandler {
    */
   static fetchRestaurantById(id, callback) {
     if (!navigator.onLine) {
-      DataHandler.showCachedRestaurants(callback);
+      DataHandler.showCachedRestaurants(callback, id);
+      // DataHandler.showCachedReviews(id, callback);
+      DataHandler.fetchReviewsById(id, callback, restaurant);
     } else {
       const rootUrl = `http://localhost:1337/restaurants/${id}`;
       fetch(rootUrl)
         .then(response => response.json())
         .then(restaurantById => {
-          DataHandler.fetchReviewsById(id, restaurantById, callback);
+          DataHandler.fetchReviewsById(id, callback, restaurantById);
         })
         .catch(err => console.log("There was an error: ", err));
     }

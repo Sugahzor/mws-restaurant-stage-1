@@ -28,7 +28,8 @@ document.addEventListener("DOMContentLoaded", event => {
       })
       .catch(e => console.log("Registration failed :(", e));
   }
-  id = getParameterByName("id");
+  id = parseInt(getParameterByName("id"));
+  console.log(id);
   favIcon = document.querySelector("#favicon");
   fetchRestaurantFromURL(restaurant => {
     fillBreadcrumb();
@@ -70,9 +71,9 @@ window.initMap = () => {
  * Get current restaurant from page URL.
  */
 fetchRestaurantFromURL = callback => {
-  if (self.restaurant) {
+  if (window.restaurant) {
     // restaurant already fetched!
-    callback(null, self.restaurant);
+    callback(null, window.restaurant);
     return;
   }
   if (!id) {
@@ -149,7 +150,8 @@ fillRestaurantHoursHTML = (
 /**
  * Create all reviews HTML and add them to the webpage.
  */
-fillReviewsHTML = (reviews = self.restaurant.reviews) => {
+fillReviewsHTML = (reviews = window.restaurant.reviews) => {
+  console.log(reviews);
   const container = document.getElementById("reviews-container");
   const title = document.createElement("h4");
   /* ACCESSIBILITY SETUP */
