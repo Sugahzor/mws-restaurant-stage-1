@@ -29,8 +29,8 @@ class DataHandler {
       fetch(rootUrl)
         .then(response => response.json())
         .then(reviewsById => {
-          restaurant.reviews = reviewsById;
-          callback(null, restaurant);
+          window.reviews = reviewsById;
+          callback(null, reviewsById);
         })
         .catch(err => console.log("There was an error: ", err));
     }
@@ -59,9 +59,6 @@ class DataHandler {
       let objectStore = db.createObjectStore("reviews", {
         keyPath: "id",
         autoIncrement: true
-      });
-      objectStore.createIndex("restaurant_id", "restaurant_id", {
-        unique: false
       });
       objectStore.transaction.oncomplete = event => {
         let reviewsObjectStore = db
@@ -117,12 +114,12 @@ class DataHandler {
         } else {
           window.restaurants = restaurantsFromIDB;
           if (idArg) {
-            window.restaurant = restaurantsFromIDB[idArg-1];
+            window.restaurant = restaurantsFromIDB[idArg - 1];
             window.restaurant.reviews = [];
-            callback(null, restaurantsFromIDB[idArg-1]);            
+            callback(null, restaurantsFromIDB[idArg - 1]);
           } else {
             callback(null, restaurantsFromIDB);
-          }          
+          }
         }
       };
     };
@@ -140,37 +137,15 @@ class DataHandler {
       let dbReviews = dbRequest.result;
       let tx = dbReviews.transaction(["reviews"], "readonly");
       let store = tx.objectStore("reviews");
-
-      // let index = store.index("restaurant_id");
-      // let getRequest = index.get(id);      
-      // getRequest.onsuccess = () => {
-      //   // window.restaurant.reviews = reviewsFromDBbyId.result;
-      //   // callback(null, restaurant);
-      //   console.log(getRequest.result, "result from getRequest de index");
-      // }
-
-      // index.openCursor().onsuccess = event => {
-      //   let cursor = event.target.result;
-      //   if (cursor) {
-      //     if (cursor.key === id) {
-      //       console.log(cursor.value);
-      //       restaurant.reviews.push(cursor.value);
-      //     }
-      //     cursor.continue();
-      //   }
-      //   console.log(restaurant, "fxdjklghdfjkgh");
-      //   callback(null, restaurant);
-      // }
       store.openCursor().onsuccess = event => {
         let cursor = event.target.result;
         if (cursor) {
-          console.log(cursor);
-          if (cursor.key === id) {
-            reviewsFromIDB.push(cursor.value);
-          }
+          reviewsFromIDB.push(cursor.value);
           cursor.continue();
         } else {
-          windows.reviews = reviewsFromIDB
+          let reviewsById = reviewsFromIDB.filter(review => review.restaurant_id === id);
+          window.reviews = reviewsById;
+          callback(null, reviewsById);
         }
       }
     }
@@ -186,14 +161,12 @@ class DataHandler {
   static fetchRestaurantById(id, callback) {
     if (!navigator.onLine) {
       DataHandler.showCachedRestaurants(callback, id);
-      // DataHandler.showCachedReviews(id, callback);
-      DataHandler.fetchReviewsById(id, callback, restaurant);
     } else {
       const rootUrl = `http://localhost:1337/restaurants/${id}`;
       fetch(rootUrl)
         .then(response => response.json())
         .then(restaurantById => {
-          DataHandler.fetchReviewsById(id, callback, restaurantById);
+          callback(null, restaurantById);
         })
         .catch(err => console.log("There was an error: ", err));
     }
@@ -203,7 +176,6 @@ class DataHandler {
    * Fetch restaurants by a cuisine type with proper error handling.
    */
   static fetchRestaurantByCuisine(cuisine, callback) {
-
     DataHandler.fetchRestaurants((error, restaurants) => {
       if (error) {
         callback(error, null);

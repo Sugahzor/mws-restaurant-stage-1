@@ -29,7 +29,6 @@ document.addEventListener("DOMContentLoaded", event => {
       .catch(e => console.log("Registration failed :(", e));
   }
   id = parseInt(getParameterByName("id"));
-  console.log(id);
   favIcon = document.querySelector("#favicon");
   fetchRestaurantFromURL(restaurant => {
     fillBreadcrumb();
@@ -91,6 +90,7 @@ fetchRestaurantFromURL = callback => {
       duplicate = true;
       callback(null, restaurant);
     });
+    DataHandler.fetchReviewsById(id, fillReviewsHTML);
   }
 };
 /**
@@ -133,16 +133,13 @@ fillRestaurantHoursHTML = (
   const hours = document.getElementById("restaurant-hours");
   for (let key in operatingHours) {
     const row = document.createElement("tr");
-
     const day = document.createElement("td");
     day.innerHTML = key;
     row.appendChild(day);
-
     const time = document.createElement("td");
     time.innerHTML = operatingHours[key];
     row.appendChild(time);
     row.setAttribute("tabindex", "0");
-
     hours.appendChild(row);
   }
 };
@@ -150,8 +147,13 @@ fillRestaurantHoursHTML = (
 /**
  * Create all reviews HTML and add them to the webpage.
  */
-fillReviewsHTML = (reviews = window.restaurant.reviews) => {
-  console.log(reviews);
+fillReviewsHTML = (error, reviews = window.restaurant.reviews) => {  
+  if(!navigator.online) {
+    DataHandler.showCachedReviews(id);
+  }
+  if (!(reviews || window.reviews)) {
+    return;
+  }
   const container = document.getElementById("reviews-container");
   const title = document.createElement("h4");
   /* ACCESSIBILITY SETUP */
@@ -159,15 +161,13 @@ fillReviewsHTML = (reviews = window.restaurant.reviews) => {
   /* *** */
   title.innerHTML = "Reviews";
   container.appendChild(title);
-
   const addReview = document.createElement("a");
   addReview.setAttribute("onclick", "toggleReviewForm()");
   addReview.setAttribute("tabindex", "0");
-  addReview.setAttribute("aria-label", `Add your review for ${self.restaurant.name}`);
+  addReview.setAttribute("aria-label", `Add your review `);
   addReview.innerHTML = "Add a review";
   addReview.href = "#form-container";
   container.appendChild(addReview);
-
   if (!reviews) {
     const noReviews = document.createElement("p");
     noReviews.innerHTML = "No reviews yet!";
@@ -192,7 +192,6 @@ saveForm = (e) => {
   let userName = document.querySelector(".reviewer-name").value;
   let rating = document.querySelector(".select-rating").value;
   let userReview = document.querySelector(".review-text").value;
-
   let newReview = {
     comments: userReview,
     createdAt: createdAt,
@@ -200,17 +199,18 @@ saveForm = (e) => {
     rating: rating,
     restaurant_id: id,
     updatedAt: createdAt
-  }
-  fillReviewsHTML([newReview]);
+  }  
   toggleReviewForm();
   document.querySelector("form").reset();
   if (!navigator.onLine) {
+    window.restaurant.reviews = [newReview];
     // add review to local storage
     const localStorageAvailable = storageAvailable("localStorage");
     if (localStorageAvailable) {
       localStorage.setItem(`offlineUserReview${id}`, JSON.stringify(newReview));
     }
   }
+  fillReviewsHTML([newReview]);
 }
 
 /**
@@ -328,7 +328,6 @@ updateOnlineStatus = () => {
 }
 
 loadMap = (event) => {
-  console.log(event)
   let bodyTag = document.querySelector("body");
   let scriptTag = document.createElement("script");
   let map = document.querySelector("#map");
